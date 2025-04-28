@@ -45,15 +45,9 @@ struct RegisterView: View {
                     }
             }.padding()
             Divider()
-            HStack {
-                Image(systemName: "lock")
-                SecureField("Password", text: $password)
-            }.padding()
+            PasswordFieldView(password: $password, placeholder: "Password").padding()
             Divider()
-            HStack {
-                Image(systemName: "lock")
-                SecureField("Verify Password", text: $verifyPassword)
-            }.padding()
+            PasswordFieldView(password: $verifyPassword, placeholder: "Verify Password").padding()
             HStack {
                 Button(action: register) {
                     Text("Register")

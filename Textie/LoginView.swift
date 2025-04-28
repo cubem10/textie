@@ -8,12 +8,19 @@
 import SwiftUI
 import Combine
 
+struct Credentials {
+    var id: String
+    var password: String
+}
+
+
+
 struct LoginView: View {
     @State private var id = ""
     @State private var password = ""
     @State private var invaildCredentials = false
     @State private var showRegisterView = false
-    
+        
     func login() {
         // TODO: implement login API call
         if id == "test" && password == "testtest" {
@@ -26,24 +33,9 @@ struct LoginView: View {
             Text("Login to Textie")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            HStack {
-                Image(systemName: "person")
-                TextField("Username", text: $id)
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled(true)
-                    .onReceive(Just(id)) { newValue in
-                        let allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-."
-                        let filtered = newValue.filter { allowedCharacters.contains($0) }
-                        if filtered != newValue {
-                            id = filtered
-                        }
-                    }
-            }.padding()
+            IdFieldView(id: $id).padding()
             Divider()
-            HStack {
-                Image(systemName: "lock")
-                SecureField("Password", text: $password)
-            }.padding()
+            PasswordFieldView(password: $password, placeholder: "Password").padding()
             HStack {
                 Button(action: login) {
                     Text("Sign In")
