@@ -23,6 +23,7 @@ struct IdFieldView: View {
         HStack {
             Image(systemName: "person")
             TextField("Username", text: $id)
+                .textContentType(.username)
                 .autocapitalization(.none)
                 .autocorrectionDisabled(true)
                 .onChange(of: id) { _, newValue in
@@ -42,6 +43,7 @@ struct PasswordFieldView: View {
         HStack {
             Image(systemName: "lock")
             SecureField("\(placeholder)", text: $password)
+                .textContentType(.password)
         }
     }
 }
