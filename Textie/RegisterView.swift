@@ -1,5 +1,5 @@
 //
-//  LoginView.swift
+//  RegisterView.swift
 //  Textie
 //
 //  Created by 하정우 on 4/28/25.
@@ -8,22 +8,27 @@
 import SwiftUI
 import Combine
 
-struct LoginView: View {
-    @State private var id = ""
-    @State private var password = ""
-    @State private var invaildCredentials = false
-    @State private var showRegisterView = false
+struct RegisterView: View {
+    @Binding var showRegisterView: Bool
+    @Binding var id: String
+    @Binding var password: String
     
-    func login() {
-        // TODO: implement login API call
+    @State private var verifyPassword: String = ""
+    @State private var declineRegister: Bool = false
+    
+    func register() {
+        // TODO: implement register API call
         if id == "test" && password == "testtest" {
-            invaildCredentials = true
+            declineRegister = true
+            return
         }
+        
+        showRegisterView = false
     }
     
     var body: some View {
         VStack {
-            Text("Login to Textie")
+            Text("Register to Textie")
                 .font(.largeTitle)
                 .fontWeight(.bold)
             HStack {
@@ -44,26 +49,25 @@ struct LoginView: View {
                 Image(systemName: "lock")
                 SecureField("Password", text: $password)
             }.padding()
+            Divider()
             HStack {
-                Button(action: login) {
-                    Text("Sign In")
-                }.disabled(id == "" || password.count < 8)
-                    .alert(isPresented: $invaildCredentials) {
-                        Alert(title: Text("Invalid Credential"), message: Text("The username or password you entered is incorrect. Please try again."))
-                    }.padding()
-                Button(action: { showRegisterView.toggle() }) {
+                Image(systemName: "lock")
+                SecureField("Verify Password", text: $verifyPassword)
+            }.padding()
+            HStack {
+                Button(action: register) {
                     Text("Register")
-                }.sheet(isPresented: $showRegisterView) {
-                    RegisterView(showRegisterView: $showRegisterView, id: $id, password: $password)
-                        .onChange(of: showRegisterView) {
-                            login()
+                        .disabled(id == "" || password.count < 8 || password != verifyPassword)
+                        .alert(isPresented: $declineRegister) {
+                            Alert(title: Text("Register Failed"), message: Text("placeholder_failedreason"))
                         }
                 }
             }
         }.padding()
+        
     }
 }
 
 #Preview {
-    LoginView()
+    RegisterView(showRegisterView: .constant(true), id: .constant(""), password: .constant(""))
 }
