@@ -16,7 +16,7 @@ struct IdFieldView: View {
             return false
         }
         
-        return (try? regex.wholeMatch(in: input)) != nil
+        return input.wholeMatch(of: regex) != nil
     }
     
     var body: some View {

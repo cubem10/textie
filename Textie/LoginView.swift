@@ -8,22 +8,14 @@
 import SwiftUI
 import Combine
 
-struct Credentials {
-    var id: String
-    var password: String
-}
-
-
-
 struct LoginView: View {
-    @State private var id = ""
-    @State private var password = ""
+    @State private var credential = Credential(id: "", password: "")
     @State private var invaildCredentials = false
     @State private var showRegisterView = false
         
     func login() {
         // TODO: implement login API call
-        if id == "test" && password == "testtest" {
+        if credential.id == "test" && credential.password == "testtest" {
             invaildCredentials = true
         }
     }
@@ -33,20 +25,20 @@ struct LoginView: View {
             Text("Login to Textie")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            IdFieldView(id: $id).padding()
+            IdFieldView(id: $credential.id).padding()
             Divider()
-            PasswordFieldView(password: $password, placeholder: "Password").padding()
+            PasswordFieldView(password: $credential.password, placeholder: "Password").padding()
             HStack {
                 Button(action: login) {
                     Text("Sign In")
-                }.disabled(id == "" || password.count < 8)
+                }.disabled(credential.id == "" || credential.password.count < 8)
                     .alert(isPresented: $invaildCredentials) {
                         Alert(title: Text("Invalid Credential"), message: Text("The username or password you entered is incorrect. Please try again."))
                     }.padding()
                 Button(action: { showRegisterView.toggle() }) {
                     Text("Register")
                 }.sheet(isPresented: $showRegisterView) {
-                    RegisterView(showRegisterView: $showRegisterView, id: $id, password: $password)
+                    RegisterView(showRegisterView: $showRegisterView, credential: $credential)
                         .onChange(of: showRegisterView) {
                             login()
                         }

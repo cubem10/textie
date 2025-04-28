@@ -10,15 +10,14 @@ import Combine
 
 struct RegisterView: View {
     @Binding var showRegisterView: Bool
-    @Binding var id: String
-    @Binding var password: String
+    @Binding var credential: Credential
     
     @State private var verifyPassword: String = ""
     @State private var declineRegister: Bool = false
     
     func register() {
         // TODO: implement register API call
-        if id == "test" && password == "testtest" {
+        if credential.id == "test" && credential.password == "testtest" {
             declineRegister = true
             return
         }
@@ -31,27 +30,15 @@ struct RegisterView: View {
             Text("Register to Textie")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            HStack {
-                Image(systemName: "person")
-                TextField("Username", text: $id)
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled(true)
-                    .onReceive(Just(id)) { newValue in
-                        let allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-."
-                        let filtered = newValue.filter { allowedCharacters.contains($0) }
-                        if filtered != newValue {
-                            id = filtered
-                        }
-                    }
-            }.padding()
+            IdFieldView(id: $credential.id).padding()
             Divider()
-            PasswordFieldView(password: $password, placeholder: "Password").padding()
+            PasswordFieldView(password: $credential.password, placeholder: "Password").padding()
             Divider()
             PasswordFieldView(password: $verifyPassword, placeholder: "Verify Password").padding()
             HStack {
                 Button(action: register) {
                     Text("Register")
-                        .disabled(id == "" || password.count < 8 || password != verifyPassword)
+                        .disabled(credential.id == "" || credential.password.count < 8 || credential.password != verifyPassword)
                         .alert(isPresented: $declineRegister) {
                             Alert(title: Text("Register Failed"), message: Text("placeholder_failedreason"))
                         }
@@ -63,5 +50,5 @@ struct RegisterView: View {
 }
 
 #Preview {
-    RegisterView(showRegisterView: .constant(true), id: .constant(""), password: .constant(""))
+    RegisterView(showRegisterView: .constant(true), credential: .constant(Credential(id: "", password: "")))
 }
