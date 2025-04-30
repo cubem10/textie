@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct ProfileView: View {
-    var profile: UserProfile
+    @State private var profile: UserProfile = UserProfile(name: "John Appleseed", userId: "johnappleseed", bio: "This is my profile. ", profileImageURL: nil, birthDate: Date(timeIntervalSince1970: 0))
     
     @State private var postDatas: [PostData] = []
+    @State private var ismyProfile: Bool = true // TODO: implement user credential comparison
+    
+    @State private var isEditing: Bool = false
     
     var body: some View {
         VStack {
@@ -23,8 +26,18 @@ struct ProfileView: View {
                 .frame(width: 100, height: 100)
                 .padding(.trailing)
                 VStack(alignment: .leading) {
-                    Text(profile.name)
-                        .font(.title)
+                    HStack {
+                        Text(profile.name)
+                            .font(.title)
+                        Button(action: {
+                            isEditing.toggle()
+                        }) {
+                            Image(systemName: "pencil")
+                        }
+                        .disabled(!ismyProfile)
+                        .opacity(ismyProfile ? 1 : 0)
+                        .foregroundStyle(.black)
+                    }
                     Button(action: {
                         UIPasteboard.general.string = profile.userId
                     }) {
@@ -51,10 +64,13 @@ struct ProfileView: View {
                 postDatas = await fetchPost()
             }
         }
+        .sheet(isPresented: $isEditing) {
+            ProfileEditView(profile: $profile)
+        }
         
     }
 }
 
 #Preview {
-    ProfileView(profile: UserProfile(name: "John Appleseed", userId: "johnappleseed", bio: "This is my profile. ", profileImageURL: nil, birthDate: Date(timeIntervalSince1970: 0)))
+    ProfileView()
 }
