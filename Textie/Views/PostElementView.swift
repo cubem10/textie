@@ -18,6 +18,7 @@ struct PostElementView: View {
                 } placeholder: {
                     Image(systemName: "person.circle.fill").resizable()
                 }.frame(width: 30, height: 30)
+                    .clipShape(Circle())
                 Text(postData.name)
                     .lineLimit(1)
             }.frame(height: 30)

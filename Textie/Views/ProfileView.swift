@@ -19,7 +19,7 @@ struct ProfileView: View {
                     image.resizable()
                 } placeholder: {
                     Image(systemName: "person.circle.fill").resizable()
-                }
+                }.clipShape(Circle())
                 .frame(width: 100, height: 100)
                 .padding(.trailing)
                 VStack(alignment: .leading) {
