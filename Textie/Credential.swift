@@ -8,6 +8,12 @@
 import Foundation
 import SwiftUI
 
+@Observable
+class UserSession {
+    var id: String = ""
+    var token: String = ""
+}
+
 struct Credential {
     var id: String
     var password: String
