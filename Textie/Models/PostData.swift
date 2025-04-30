@@ -21,6 +21,6 @@ func fetchPost() async -> [PostData] {
     
     return [
         PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Lorem ipsum dolor sit amet.", likes: 100),
-        PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Lorem ipsum dolor sit amet.", likes: 1234)
+        PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.", likes: 1234)
     ]
 }

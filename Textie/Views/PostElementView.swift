@@ -19,14 +19,18 @@ struct PostElementView: View {
                     Image(systemName: "person.circle.fill").resizable()
                 }.frame(width: 30, height: 30)
                 Text(postData.name)
+                    .lineLimit(1)
             }.frame(height: 30)
+                .padding(.vertical, 5)
             Text(postData.content)
                 .padding(.bottom)
+                .lineLimit(nil)
             HStack {
                 Image(systemName: "heart")
                 Text(postData.likes.formatted(.number.notation(.compactName)))
+                    .lineLimit(1)
             }
-        }.frame(height: 300)
+        }
         
     }
 }

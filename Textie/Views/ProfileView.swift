@@ -10,6 +10,8 @@ import SwiftUI
 struct ProfileView: View {
     var profile: UserProfile
     
+    @State private var postDatas: [PostData] = []
+    
     var body: some View {
         VStack {
             HStack {
@@ -42,6 +44,12 @@ struct ProfileView: View {
             }
             .frame(height: 75)
             .padding()
+            List(postDatas) { post in
+                PostElementView(postData: post).listRowInsets(EdgeInsets())
+                    .padding()
+            }.task {
+                postDatas = await fetchPost()
+            }
         }
         
     }
