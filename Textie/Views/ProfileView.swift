@@ -48,11 +48,9 @@ struct ProfileView: View {
                         }
                     }.foregroundStyle(.black)
                     Spacer()
-                    if let bio = profile.bio {
-                        Text(bio)
-                            .font(.body)
-                            .foregroundColor(.black)
-                    }
+                    Text(profile.bio)
+                        .font(.body)
+                        .foregroundColor(.black)
                 }
             }
             .frame(height: 75)

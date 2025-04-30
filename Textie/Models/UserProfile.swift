@@ -11,9 +11,9 @@ struct UserProfile {
     var name: String
     var userId: String
 
-    var bio: String?
+    var bio: String
     var profileImageURL: URL?
-    var birthDate: Date?
+    var birthDate: Date
 }
 
 @Observable

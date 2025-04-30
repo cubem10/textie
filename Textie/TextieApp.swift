@@ -13,8 +13,9 @@ struct TextieApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView()
-                .environment(userSession)
+//            LoginView()
+//                .environment(userSession)
+            ProfileView()
         }
     }
 }
