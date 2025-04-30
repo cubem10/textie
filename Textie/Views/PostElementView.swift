@@ -8,27 +8,23 @@
 import SwiftUI
 
 struct PostElementView: View {
-    var name: String
-    var profileImageURL: URL?
-    
-    var content: String
-    var likes: Int
+    var postData: PostData
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                AsyncImage(url: profileImageURL) { image in
+                AsyncImage(url: postData.profileImageURL) { image in
                     image.resizable()
                 } placeholder: {
                     Image(systemName: "person.circle.fill").resizable()
                 }.frame(width: 30, height: 30)
-                Text(name)
+                Text(postData.name)
             }.frame(height: 30)
-            Text(content)
+            Text(postData.content)
                 .padding(.bottom)
             HStack {
                 Image(systemName: "heart")
-                Text(likes.formatted(.number.notation(.compactName)))
+                Text(postData.likes.formatted(.number.notation(.compactName)))
             }
         }.frame(height: 300)
         
@@ -36,5 +32,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(name: "John Appleseed", profileImageURL: URL(string: "http://example.com/profile.jpg"), content: "Post content goes here. ", likes: 1234567890)
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "http://example.com/profile.jpg"), content: "Post content goes here. ", likes: 1234567890))
 }
