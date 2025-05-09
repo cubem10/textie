@@ -9,13 +9,10 @@ import SwiftUI
 
 @main
 struct TextieApp: App {
-    @State private var userSession = UserSession()
     
     var body: some Scene {
         WindowGroup {
-//            LoginView()
-//                .environment(userSession)
-            ProfileView()
+            LoginView()
         }
     }
 }
