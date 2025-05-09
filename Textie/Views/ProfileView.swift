@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @State private var profile: UserProfile = UserProfile(id: UUID(), name: "John Appleseed", userId: "johnappleseed", bio: "This is my profile. ", profileImageURL: nil, birthDate: Date(timeIntervalSince1970: 0))
+    @State private var profile: UserProfile = UserProfile(id: UUID(), name: "John Appleseed", userId: "johnappleseed")
     
     @State private var postDatas: [PostData] = []
     @State private var ismyProfile: Bool = true // TODO: implement user credential comparison
@@ -16,7 +16,7 @@ struct ProfileView: View {
     var body: some View {
         VStack {
             HStack {
-                ProfileImageView(imageURL: profile.profileImageURL)
+                ProfileImageView()
                 .frame(width: 100, height: 100)
                 .padding(.trailing)
                 VStack(alignment: .leading) {
@@ -34,9 +34,6 @@ struct ProfileView: View {
                         }
                     }.foregroundStyle(.black)
                     Spacer()
-                    Text(profile.bio)
-                        .font(.body)
-                        .foregroundColor(.black)
                 }
             }
             .frame(height: 75)

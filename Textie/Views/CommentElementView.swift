@@ -12,7 +12,7 @@ struct CommentElementView: View {
     
     var body: some View {
         HStack {
-            ProfileImageView(imageURL: commentData.profileImageURL)
+            ProfileImageView()
                 .frame(width: 44, height: 44)
             VStack(alignment: .leading) {
                 Text(commentData.name)

@@ -16,7 +16,7 @@ struct PostElementView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                ProfileImageView(imageURL: postData.profileImageURL).frame(width: 30, height: 30)
+                ProfileImageView().frame(width: 30, height: 30)
                 Text(postData.name)
                     .lineLimit(1)
             }.frame(height: 30)

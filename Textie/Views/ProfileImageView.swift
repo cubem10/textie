@@ -8,14 +8,8 @@
 import SwiftUI
 
 struct ProfileImageView: View {
-    var imageURL: URL?
-    
     var body: some View {
-        AsyncImage(url: imageURL) { image in
-            image.resizable()
-        } placeholder: {
-            Image(systemName: "person.circle.fill").resizable().foregroundStyle(.black)
-        }.clipShape(Circle())
+        Image(systemName: "person.circle.fill").resizable().foregroundStyle(.black).clipShape(Circle())
     }
 }
 

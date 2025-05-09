@@ -11,10 +11,6 @@ struct UserProfile: Identifiable {
     let id: UUID
     var name: String
     var userId: String
-
-    var bio: String
-    var profileImageURL: URL?
-    var birthDate: Date
 }
 
 @Observable
