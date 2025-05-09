@@ -18,11 +18,7 @@ struct ProfileView: View {
     var body: some View {
         VStack {
             HStack {
-                AsyncImage(url: profile.profileImageURL) { image in
-                    image.resizable()
-                } placeholder: {
-                    Image(systemName: "person.circle.fill").resizable()
-                }.clipShape(Circle())
+                ProfileImageView(imageURL: profile.profileImageURL)
                 .frame(width: 100, height: 100)
                 .padding(.trailing)
                 VStack(alignment: .leading) {
@@ -58,6 +54,7 @@ struct ProfileView: View {
             List(postDatas) { post in
                 PostElementView(postData: post).listRowInsets(EdgeInsets())
                     .padding()
+
             }.task {
                 postDatas = await fetchPost()
             }

@@ -9,16 +9,14 @@ import SwiftUI
 
 struct PostElementView: View {
     var postData: PostData
+    @State private var showComment: Bool = false
+    @State private var liked: Bool = false
+    @State private var commentDatas: [CommentData] = []
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                AsyncImage(url: postData.profileImageURL) { image in
-                    image.resizable()
-                } placeholder: {
-                    Image(systemName: "person.circle.fill").resizable()
-                }.frame(width: 30, height: 30)
-                    .clipShape(Circle())
+                ProfileImageView(imageURL: postData.profileImageURL).frame(width: 30, height: 30)
                 Text(postData.name)
                     .lineLimit(1)
             }.frame(height: 30)
@@ -27,9 +25,39 @@ struct PostElementView: View {
                 .padding(.bottom)
                 .lineLimit(nil)
             HStack {
-                Image(systemName: "heart")
+                Button(action: {
+                    liked.toggle()
+                }) {
+                    if liked { Image(systemName: "heart.fill") }
+                    else { Image(systemName: "heart") }
+                }
+                .foregroundStyle(.black)
+                .contentShape(Rectangle())
                 Text(postData.likes.formatted(.number.notation(.compactName)))
                     .lineLimit(1)
+                Button(action: {
+                    showComment.toggle()
+                }) {
+                    Image(systemName: "bubble")
+                }.foregroundStyle(.black)
+                    .contentShape(Rectangle())
+                    .sheet(isPresented: $showComment) {
+                        VStack {
+                            Text("Comments")
+                                .font(.title)
+                                .fontWeight(.bold)
+                            Divider()
+                            List(commentDatas) { commentData in
+                                CommentElementView(commentData: commentData)
+                                    .listRowInsets(EdgeInsets())
+                            }
+                            .listStyle(.plain)
+                            .task {
+                                commentDatas = await fetchComments(forPostWithId: postData.id)
+                            }
+                            
+                        }.padding()
+                    }
             }
         }
         

@@ -37,13 +37,7 @@ struct ProfileEditView: View {
                     Text("Profile Picture")
                     Spacer()
                     PhotosPicker(selection: $selectedImage, matching: .images, preferredItemEncoding: .automatic) {
-                        AsyncImage(url: profile.profileImageURL) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    Image(systemName: "person.circle.fill").resizable()
-                                        .foregroundStyle(.black)
-                                }
-                                .clipShape(Circle())
+                        ProfileImageView(imageURL: profile.profileImageURL)
                                 .frame(width: 80, height: 80)
                                 .padding()
                     }
