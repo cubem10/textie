@@ -48,6 +48,20 @@ struct PasswordFieldView: View {
     }
 }
 
+struct NicknameFieldView: View {
+    @Binding var nickname: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "person")
+            TextField("Nickname", text: $nickname)
+                .textContentType(.username)
+                .autocapitalization(.none)
+                .autocorrectionDisabled(true)
+        }
+    }
+}
+
 #Preview("IdFieldView") {
     IdFieldView(id: .constant(""))
 }

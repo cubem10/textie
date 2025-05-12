@@ -37,6 +37,7 @@ enum LoginError: Error {
     case badEncoding
     case invaildResponse
     case invalidCredential
+    case existingUserRegistration
 }
 
 func saveTokenToKeychain(token: String, key: String) -> Bool {
@@ -68,10 +69,32 @@ func getTokenFromKeychain(key: String) -> String? {
     return nil
 }
 
-func login(username: String, password: String) throws {
+func parseTokenResponse(encodedResponse data: Data) {
+    print(String(data: data, encoding: .utf8) ?? "")
+    
     var accessToken: String = ""
     var refreshToken: String = ""
     
+    do {
+        let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
+        accessToken = decodedResponse.access_token
+        refreshToken = decodedResponse.refresh_token
+        print("Token successfully obtained")
+        
+        let isAccessTokenSaved = saveTokenToKeychain(token: accessToken, key: "access_token")
+        let isRefreshTokenSaved = saveTokenToKeychain(token: refreshToken, key: "refresh_token")
+        
+        if isAccessTokenSaved && isRefreshTokenSaved {
+            print("Token saved successfully")
+        } else {
+            print("Failed to save tokens")
+        }
+    } catch {
+        print("Failed to decode JSON: \(error)")
+    }
+}
+
+func login(username: String, password: String) throws {
     guard let url = URL(string: serverURLString + "/signin?username=\(username)&password=\(password)") else {
         throw LoginError.badURL
     }
@@ -92,25 +115,40 @@ func login(username: String, password: String) throws {
         
         if let data = data {
             print(String(data: data, encoding: .utf8) ?? "")
-            do {
-                let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
-                accessToken = decodedResponse.access_token
-                refreshToken = decodedResponse.refresh_token
-                print("Token successfully obtained")
-                
-                let isAccessTokenSaved = saveTokenToKeychain(token: accessToken, key: "access_token")
-                let isRefreshTokenSaved = saveTokenToKeychain(token: refreshToken, key: "refresh_token")
-                
-                if isAccessTokenSaved && isRefreshTokenSaved {
-                    print("Token saved successfully")
-                } else {
-                    print("Failed to save tokens")
-                }
-            } catch {
-                print("Failed to decode JSON: \(error)")
-            }
+            parseTokenResponse(encodedResponse: data)
         }
     }.resume()
+    
+}
+
+func register(username: String, password: String, nickname: String) throws {
+    print("signup?username=\(username)&password=\(password)&nickname=\(nickname)")
+    
+    guard let url = URL(string: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)") else {
+        print("register: bad URL string")
+        throw LoginError.badURL
+    }
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.addValue("application/json", forHTTPHeaderField: "accept")
+    
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        if let error = error {
+            print("Error: \(error.localizedDescription)")
+            return
+        }
+        
+        if let httpResponse = response as? HTTPURLResponse {
+            // TODO: 500 error when user exists
+            print("Response status code: \(httpResponse.statusCode)")
+        }
+        
+        if let data = data {
+            parseTokenResponse(encodedResponse: data)
+        }
+    }.resume()
+    
     
 }
 

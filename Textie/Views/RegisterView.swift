@@ -12,19 +12,10 @@ struct RegisterView: View {
     @Binding var showRegisterView: Bool
     @Binding var username: String
     @Binding var password: String
+    @Binding var nickname: String
     
     @State private var verifyPassword: String = ""
     @State private var declineRegister: Bool = false
-    
-    func register() {
-        // TODO: implement register API call
-        if username == "test" && password == "testtest" {
-            declineRegister = true
-            return
-        }
-        
-        showRegisterView = false
-    }
     
     var body: some View {
         VStack {
@@ -36,10 +27,12 @@ struct RegisterView: View {
             PasswordFieldView(password: $password, placeholder: "Password").padding()
             Divider()
             PasswordFieldView(password: $verifyPassword, placeholder: "Verify Password").padding()
+            Divider()
+            NicknameFieldView(nickname: $nickname).padding()
             HStack {
-                Button(action: register) {
+                Button(action: { try? register(username: username, password: password, nickname: nickname) }) {
                     Text("Register")
-                        .disabled(username == "" || password.count < 8 || password != verifyPassword)
+                        .disabled(username == "" || password.count < 8 || password != verifyPassword || nickname == "")
                         .alert(isPresented: $declineRegister) {
                             Alert(title: Text("Register Failed"), message: Text("placeholder_failedreason"))
                         }
@@ -51,5 +44,5 @@ struct RegisterView: View {
 }
 
 #Preview {
-    RegisterView(showRegisterView: .constant(true), username: .constant(""), password: .constant(""))
+    RegisterView(showRegisterView: .constant(true), username: .constant(""), password: .constant(""), nickname: .constant(""))
 }

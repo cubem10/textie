@@ -11,6 +11,7 @@ import Combine
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
+    @State private var nickname = ""
     
     @State private var invaildCredentials = false
     @State private var showRegisterView = false
@@ -42,7 +43,7 @@ struct LoginView: View {
                 Button(action: { showRegisterView.toggle() }) {
                     Text("Register")
                 }.sheet(isPresented: $showRegisterView) {
-                    RegisterView(showRegisterView: $showRegisterView, username: $username, password: $password)
+                    RegisterView(showRegisterView: $showRegisterView, username: $username, password: $password, nickname: $nickname)
                         .onChange(of: showRegisterView) {
                             do {
                                 try login(username: username, password: password)
