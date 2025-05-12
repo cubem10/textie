@@ -32,21 +32,6 @@ enum KeyChainError: Error {
     case unhandledError(status: OSStatus)
 }
 
-extension Binding where Value == Credential {
-    var id: Binding<String> {
-        Binding<String>(
-            get: { self.wrappedValue.username },
-            set: { self.wrappedValue.username = $0}
-        )
-    }
-    var password: Binding<String> {
-        Binding<String>(
-            get: { self.wrappedValue.password },
-            set: { self.wrappedValue.password = $0}
-        )
-    }
-}
-
 enum LoginError: Error {
     case badURL
     case badEncoding
