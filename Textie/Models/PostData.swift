@@ -36,12 +36,38 @@ struct PostData: Identifiable {
     var likes: Int
 }
 
+struct CommentDataDTO: Identifiable {
+    let createdAt: String
+    let postId: UUID
+    let id: UUID
+    let content: String
+    let userId: UUID
+    
+    enum CodingKeys: String, CodingKey {
+        case createdAt = "created_at"
+        case postId = "post_id"
+        case id
+        case content
+        case userId = "user_id"
+    }
+}
+
 struct CommentData: Identifiable {
     let id: UUID
     let name: String
     let profileImageURL: URL?
     
     var content: String
+}
+
+struct LikeDataDTO {
+    let postId: UUID
+    let likeCount: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case postId = "post_id"
+        case likeCount = "like_count"
+    }
 }
 
 func fetchPost() async -> [PostData] {
