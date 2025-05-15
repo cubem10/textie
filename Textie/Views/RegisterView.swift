@@ -30,7 +30,7 @@ struct RegisterView: View {
             Divider()
             NicknameFieldView(nickname: $nickname).padding()
             HStack {
-                Button(action: { try? register(username: username, password: password, nickname: nickname) }) {
+                Button(action: { Task { try? await register(username: username, password: password, nickname: nickname) } }) {
                     Text("Register")
                         .disabled(username == "" || password.count < 8 || password != verifyPassword || nickname == "")
                         .alert(isPresented: $declineRegister) {

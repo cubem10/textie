@@ -29,10 +29,12 @@ struct LoginView: View {
             PasswordFieldView(password: $password, placeholder: "Password").padding()
             HStack {
                 Button(action: {
-                    do {
-                        try login(username: username, password: password)
-                    } catch {
-                        loginFailed = true
+                    Task {
+                        do {
+                            try await login(username: username, password: password)
+                        } catch {
+                            loginFailed = true
+                        }
                     }
                 }) {
                     Text("Sign In")
@@ -45,10 +47,12 @@ struct LoginView: View {
                 }.sheet(isPresented: $showRegisterView) {
                     RegisterView(showRegisterView: $showRegisterView, username: $username, password: $password, nickname: $nickname)
                         .onChange(of: showRegisterView) {
-                            do {
-                                try login(username: username, password: password)
-                            } catch {
-                                loginFailed = true
+                            Task {
+                                do {
+                                    try await login(username: username, password: password)
+                                } catch {
+                                    loginFailed = true
+                                }
                             }
                         }
                 }

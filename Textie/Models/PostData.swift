@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PostDataDTO: Identifiable {
+struct PostDataDTO: Identifiable, Decodable {
     let isEdited: Bool
     let title: String
     let createdAt: String
@@ -27,7 +27,7 @@ struct PostDataDTO: Identifiable {
     }
 }
 
-struct PostData: Identifiable {
+struct PostData: Identifiable, Decodable {
     let id: UUID
     let name: String
     
@@ -46,7 +46,7 @@ extension PostData {
     }
 }
 
-struct CommentDataDTO: Identifiable {
+struct CommentDataDTO: Identifiable, Decodable {
     let createdAt: String
     let postId: UUID
     let id: UUID
@@ -62,7 +62,7 @@ struct CommentDataDTO: Identifiable {
     }
 }
 
-struct CommentData: Identifiable {
+struct CommentData: Identifiable, Decodable {
     let id: UUID
     let name: String
     let profileImageURL: URL?
