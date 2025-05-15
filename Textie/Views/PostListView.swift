@@ -11,8 +11,6 @@ struct PostListView: View {
     @StateObject private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
     
     var body: some View {
-        var postDatas: [PostData] = []
-        
         VStack(alignment: .leading) {
             Button(action: {
                 let isAccessTokenRemoved: Bool = saveTokenToKeychain(token: "", key: "access_token")
@@ -34,9 +32,9 @@ struct PostListView: View {
                     ProgressView("Loading...")
                 } else {
                     let posts = viewModel.postDatas
-                    ForEach(posts) { postData in
-                        PostElementView(postData: postData).listRowInsets(EdgeInsets()).padding()
-                    }
+                    List(posts) { postData in
+                        PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                    }.listStyle(.plain)
                 }
             }
             
