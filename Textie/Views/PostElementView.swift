@@ -65,5 +65,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "http://example.com/profile.jpg"), content: "Post content goes here. ", likes: 1234567890))
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", content: "Post content goes here. ", likes: 1234567890))
 }

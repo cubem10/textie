@@ -30,10 +30,20 @@ struct PostDataDTO: Identifiable {
 struct PostData: Identifiable {
     let id: UUID
     let name: String
-    let profileImageURL: URL?
     
     var content: String
     var likes: Int
+}
+
+extension PostData {
+    static func construct(post: PostDataDTO, likes: Int = 0) -> PostData {
+        return PostData(
+            id: post.id,
+            name: post.userId.uuidString, // MARK: need to implement API that fetches username with UUID
+            content: post.content,
+            likes: likes
+        )
+    }
 }
 
 struct CommentDataDTO: Identifiable {
@@ -74,8 +84,8 @@ func fetchPost() async -> [PostData] {
     // TODO: implement API call
     
     return [
-        PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Lorem ipsum dolor sit amet.", likes: 100),
-        PostData(id: UUID(), name: "John Appleseed", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.", likes: 1234)
+        PostData(id: UUID(), name: "John Appleseed", content: "Lorem ipsum dolor sit amet.", likes: 100),
+        PostData(id: UUID(), name: "John Appleseed", content: "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.", likes: 1234)
     ]
 }
 
