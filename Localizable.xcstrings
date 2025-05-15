@@ -52,6 +52,12 @@
         }
       }
     },
+    "Loading..." : {
+
+    },
+    "Log out" : {
+
+    },
     "LOGIN_FAIL" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -153,6 +159,9 @@
           }
         }
       }
+    },
+    "Posts" : {
+
     },
     "REGISTER_BUTTON" : {
       "extractionState" : "manual",

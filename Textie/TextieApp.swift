@@ -12,7 +12,11 @@ struct TextieApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            if let accessToken = getTokenFromKeychain(key: "access_token"), accessToken != "" {
+                PostListView()
+            } else {
+                LoginView()
+            }
         }
     }
 }
