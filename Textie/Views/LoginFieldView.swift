@@ -22,7 +22,7 @@ struct IdFieldView: View {
     var body: some View {
         HStack {
             Image(systemName: "person")
-            TextField("Username", text: $id)
+            TextField("USERNAME_PLACEHOLDER", text: $id)
                 .textContentType(.username)
                 .autocapitalization(.none)
                 .autocorrectionDisabled(true)
@@ -37,12 +37,12 @@ struct IdFieldView: View {
 
 struct PasswordFieldView: View {
     @Binding var password: String
-    var placeholder: String
+    var placeholder: LocalizedStringKey
     
     var body: some View {
         HStack {
             Image(systemName: "lock")
-            SecureField("\(placeholder)", text: $password)
+            SecureField(placeholder, text: $password)
                 .textContentType(.password)
         }
     }
@@ -54,7 +54,7 @@ struct NicknameFieldView: View {
     var body: some View {
         HStack {
             Image(systemName: "person")
-            TextField("Nickname", text: $nickname)
+            TextField("NICKNAME_PLACEHOLDER", text: $nickname)
                 .textContentType(.username)
                 .autocapitalization(.none)
                 .autocorrectionDisabled(true)

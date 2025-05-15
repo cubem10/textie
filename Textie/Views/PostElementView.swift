@@ -43,7 +43,7 @@ struct PostElementView: View {
                     .contentShape(Rectangle())
                     .sheet(isPresented: $showComment) {
                         VStack {
-                            Text("Comments")
+                            Text("COMMENTS")
                                 .font(.title)
                                 .fontWeight(.bold)
                             Divider()

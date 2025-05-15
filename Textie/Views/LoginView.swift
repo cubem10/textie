@@ -21,12 +21,12 @@ struct LoginView: View {
     
     var body: some View {
         VStack {
-            Text("Login to Textie")
+            Text("LOGIN_MAIN_TEXT")
                 .font(.largeTitle)
                 .fontWeight(.bold)
             IdFieldView(id: $username).padding()
             Divider()
-            PasswordFieldView(password: $password, placeholder: "Password").padding()
+            PasswordFieldView(password: $password, placeholder: "PASSWORD_PLACEHOLDER").padding()
             HStack {
                 Button(action: {
                     Task {
@@ -37,13 +37,13 @@ struct LoginView: View {
                         }
                     }
                 }) {
-                    Text("Sign In")
+                    Text("SIGNIN_BUTTON")
                 }.disabled(username == "" || password.count < 8)
                     .alert(isPresented: $invaildCredentials) {
-                        Alert(title: Text("Invalid Credential"), message: Text("The username or password you entered is incorrect. Please try again."))
+                        Alert(title: Text("INVALID_CREDENTIAL"), message: Text("INVAILD_CREDENTIAL_DETAILS"))
                     }.padding()
                 Button(action: { showRegisterView.toggle() }) {
-                    Text("Register")
+                    Text("REGISTER_BUTTON")
                 }.sheet(isPresented: $showRegisterView) {
                     RegisterView(showRegisterView: $showRegisterView, username: $username, password: $password, nickname: $nickname)
                         .onChange(of: showRegisterView) {
@@ -57,7 +57,7 @@ struct LoginView: View {
                         }
                 }
                 .alert(isPresented: $loginFailed) {
-                    Alert(title: Text("Login Failed"), message: Text("Please try again later."))
+                    Alert(title: Text("LOGIN_FAIL"), message: Text("LOGIN_FAIL_DETAIL"))
                 }
             }
         }.padding()

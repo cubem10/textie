@@ -28,7 +28,7 @@ struct ProfileView: View {
                         UIPasteboard.general.string = profile.userId
                     }) {
                         HStack {
-                            Text("@\(profile.userId)")
+                            Text("@" + profile.userId)
                                 .font(.subheadline)
                             Image(systemName: "document.on.document.fill").scaleEffect(0.7)
                         }

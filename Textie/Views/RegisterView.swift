@@ -19,14 +19,14 @@ struct RegisterView: View {
     
     var body: some View {
         VStack {
-            Text("Register to Textie")
+            Text("REGISTER_MAIN_TEXT")
                 .font(.largeTitle)
                 .fontWeight(.bold)
             IdFieldView(id: $username).padding()
             Divider()
-            PasswordFieldView(password: $password, placeholder: "Password").padding()
+            PasswordFieldView(password: $password, placeholder: "PASSWORD_PLACEHOLDER").padding()
             Divider()
-            PasswordFieldView(password: $verifyPassword, placeholder: "Verify Password").padding()
+            PasswordFieldView(password: $verifyPassword, placeholder: "PASSWORD_VERIFY_PLACEHOLDER").padding()
             Divider()
             NicknameFieldView(nickname: $nickname).padding()
             HStack {
@@ -35,10 +35,10 @@ struct RegisterView: View {
                         existingUser = true
                     }
                 }) } }) {
-                    Text("Register")
+                    Text("REGISTER_BUTTON")
                         .disabled(username == "" || password.count < 8 || password != verifyPassword || nickname == "")
                         .alert(isPresented: $existingUser) {
-                            Alert(title: Text("Register Failed"), message: Text("User with this username already exists."))
+                            Alert(title: Text("REGISTER_FAIL_TITLE"), message: Text("REGISTER_FAIL_DETAIL"))
                         }
                 }
             }
