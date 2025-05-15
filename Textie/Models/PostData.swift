@@ -7,6 +7,26 @@
 
 import Foundation
 
+struct PostDataDTO: Identifiable {
+    let isEdited: Bool
+    let title: String
+    let createdAt: String
+    let content: String
+    let id: UUID
+    let userId: UUID
+    let updatedAt: String
+    
+    enum CodingKeys: String, CodingKey {
+        case isEdited = "is_edited"
+        case title
+        case createdAt = "created_at"
+        case content
+        case id
+        case userId = "user_id"
+        case updatedAt = "updated_at"
+    }
+}
+
 struct PostData: Identifiable {
     let id: UUID
     let name: String
