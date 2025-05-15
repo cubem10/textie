@@ -69,7 +69,7 @@ func getTokenFromKeychain(key: String) -> String? {
     return nil
 }
 
-func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withCredential credential: Credential = Credential(username: "", password: "")) async throws -> Data {
+func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withCredential credential: Credential = Credential(username: "", password: "")) async throws -> (Data, URLResponse) {
     guard let url = URL(string: endpoint) else {
         throw BackendError.badURL
     }
@@ -78,13 +78,13 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     request.httpMethod = method
     
     do {
-        let (responseData, _): (Data, URLResponse) = try await URLSession.shared.data(for: request)
-        return responseData
+        let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
+        return (responseData, response)
     } catch {
         print("An error occurred while processing the request: \(error)")
     }
     
-    return Data()
+    return (Data(), URLResponse())
 }
 
 func parseTokenResponse(encodedResponse data: Data) {
@@ -92,9 +92,6 @@ func parseTokenResponse(encodedResponse data: Data) {
     
     var accessToken: String = ""
     var refreshToken: String = ""
-    
-    print("raw token response: \(String(data: data, encoding: .utf8) ?? "")")
-    
     do {
         let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
         accessToken = decodedResponse.access_token
@@ -116,17 +113,24 @@ func parseTokenResponse(encodedResponse data: Data) {
 
 func login(username: String, password: String) async throws {
     do {
-        parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST"))
+        parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
     } catch {
         print("Failed to send login request to server: \(error)")
     }
 }
 
-func register(username: String, password: String, nickname: String) async throws {
+func register(username: String, password: String, nickname: String, onError: @escaping (Error) -> Void) async throws {
     do {
-        parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST"))
+        let response: (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
+        
+        if let response = response.1 as? HTTPURLResponse, response.statusCode == 500 {
+            print("User already exists with this username, response code \(response.statusCode)")
+            throw BackendError.existingUserRegistration
+        }
+        
+        parseTokenResponse(encodedResponse: response.0)
     } catch {
-        print("Error parsing response: \(error)")
+        onError(error)
     }
     
 }
@@ -138,7 +142,7 @@ func refreshSession() async throws {
         throw BackendError.invalidCredential
     }
     
-    if let data = try? await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST") {
+    if let data = try? await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0 {
         do {
             let decodedResponse = try JSONDecoder().decode([String: String].self, from: data)
             accessToken = decodedResponse["access_token"] ?? ""

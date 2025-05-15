@@ -15,7 +15,7 @@ struct RegisterView: View {
     @Binding var nickname: String
     
     @State private var verifyPassword: String = ""
-    @State private var declineRegister: Bool = false
+    @State private var existingUser: Bool = false
     
     var body: some View {
         VStack {
@@ -30,11 +30,15 @@ struct RegisterView: View {
             Divider()
             NicknameFieldView(nickname: $nickname).padding()
             HStack {
-                Button(action: { Task { try? await register(username: username, password: password, nickname: nickname) } }) {
+                Button(action: { Task { try? await register(username: username, password: password, nickname: nickname, onError: { error in
+                    if case BackendError.existingUserRegistration = error {
+                        existingUser = true
+                    }
+                }) } }) {
                     Text("Register")
                         .disabled(username == "" || password.count < 8 || password != verifyPassword || nickname == "")
-                        .alert(isPresented: $declineRegister) {
-                            Alert(title: Text("Register Failed"), message: Text("placeholder_failedreason"))
+                        .alert(isPresented: $existingUser) {
+                            Alert(title: Text("Register Failed"), message: Text("User with this username already exists."))
                         }
                 }
             }

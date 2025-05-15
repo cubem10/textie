@@ -22,7 +22,7 @@ class PostElementViewModel: APICaller, ObservableObject {
     
     func fetchPostData(postId: Int) async throws {
         if let data = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") {
-            self.postDatas = try JSONDecoder().decode([PostData].self, from: data)
+            self.postDatas = try JSONDecoder().decode([PostData].self, from: data.0)
         } else {
             throw BackendError.invaildResponse
         }
