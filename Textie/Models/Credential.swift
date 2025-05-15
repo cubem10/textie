@@ -198,3 +198,14 @@ func refreshSession() throws {
     
 }
 
+class APICaller {
+    private var accessToken: String = ""
+    
+    init() {
+        guard let token = getTokenFromKeychain(key: "access_token") else {
+            return
+        }
+        
+        accessToken = token
+    }
+}
