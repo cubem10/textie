@@ -14,9 +14,6 @@ class UserStateViewModel {
     
     init() {
         Task {
-            isLoading = true
-            defer { isLoading = false }
-            
             do {
                 let refreshResult: Bool = try await refreshSession()
                 if refreshResult {
@@ -82,21 +79,24 @@ class UserStateViewModel {
         }
     }
 
+    @MainActor
     func login(username: String, password: String) async throws {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
-            await MainActor.run {
-                isLoading = true
-                defer { isLoading = false }
-                
-                isLoggedIn = true
-            }
+            isLoggedIn = true
         } catch {
             print("Failed to send login request to server: \(error)")
         }
     }
 
+    @MainActor
     func register(username: String, password: String, nickname: String, onError: @escaping (Error) -> Void) async throws {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             let response: (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
             
@@ -107,48 +107,35 @@ class UserStateViewModel {
             
             parseTokenResponse(encodedResponse: response.0)
             
-            await MainActor.run {
-                isLoading = true
-                defer { isLoading = false }
-                
-                isLoggedIn = true
-            }
+            isLoggedIn = true
         } catch {
             onError(error)
         }
         
     }
 
+    @MainActor
     func refreshSession() async throws -> Bool {
-        var accessToken: String = ""
+        isLoading = true
+        defer { isLoading = false }
         
-        guard let refreshToken = getTokenFromKeychain(key: "refresh_token") else {
-            throw BackendError.invalidCredential
-        }
-        
-        if let data = try? await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0 {
-            do {
-                let decodedResponse = try JSONDecoder().decode([String: String].self, from: data)
-                accessToken = decodedResponse["access_token"] ?? ""
-                
-                if accessToken != "" && saveTokenToKeychain(token: accessToken, key: "access_token") {
-                    print("Access Token saved successfully")
-                    return true
-                } else {
-                    print("An error occurred while saving access token")
-                    return false
-                }
-            } catch {
-                print("Failed to decode refresh token response: \(error)")
+        do {
+            guard let refreshToken: String = getTokenFromKeychain(key: "refresh_token") else {
+                print("Invaild refresh token")
                 return false
             }
-        } else {
-            throw BackendError.invaildResponse
+            parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0)
+            return true
+        } catch {
+            print("An error occurred while refreshing session token. \(error)")
+            return false
         }
-        
     }
     
     func logout() async -> Bool {
+        isLoading = true
+        defer { isLoading = false }
+        
         let accessTokenQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                     kSecAttrService as String: "Textie",
                                     kSecAttrAccount as String: "access_token",
@@ -165,12 +152,7 @@ class UserStateViewModel {
         
         let refreshTokenStatus = SecItemCopyMatching(refreshTokenQuery as CFDictionary, nil)
         
-        await MainActor.run {
-            isLoading = true
-            defer { isLoading = false }
-            
-            isLoggedIn = false
-        }
+        isLoggedIn = false
         
         return accessTokenStatus == errSecSuccess && refreshTokenStatus == errSecSuccess
     }
