@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(UserStateViewModel.self) var userStateViewModel
+    @Environment(\.colorScheme) var colorScheme
     @State private var viewModel: ProfileViewModel = .init()
     @State private var editingProfile: Bool = false
     var uuid: UUID
@@ -38,7 +39,7 @@ struct ProfileView: View {
                                         .font(.subheadline)
                                     Image(systemName: "document.on.document.fill").scaleEffect(0.7)
                                 }
-                            }.foregroundStyle(.black)
+                            }.foregroundStyle(colorScheme == .dark ? .white : .black)
                         }
                         Spacer()
                         if isMyProfile {

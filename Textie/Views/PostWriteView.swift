@@ -11,6 +11,7 @@ struct PostWriteView: View {
     @State var title: String = ""
     @State var context: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
         VStack {
             HStack {
@@ -32,7 +33,7 @@ struct PostWriteView: View {
                 TextField(String(""), text: $title)
                     .padding(EdgeInsets())
                     .overlay {
-                        RoundedRectangle(cornerRadius: 4).stroke(Color.black, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 4).stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
                     }
                 if title.isEmpty {
                     Text("POST_WRITE_TITLE_PLACEHOLDER").foregroundStyle(Color.gray)
@@ -48,7 +49,7 @@ struct PostWriteView: View {
             }
         }
         .overlay {
-                RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 8).stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
         }
         Spacer()
         }.padding()

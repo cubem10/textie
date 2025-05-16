@@ -12,6 +12,7 @@ struct PostElementView: View {
     @State private var showComment: Bool = false
     @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -37,7 +38,7 @@ struct PostElementView: View {
                     if liked { Image(systemName: "heart.fill") }
                     else { Image(systemName: "heart") }
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(colorScheme == .dark ? .white : .black)
                 .contentShape(Rectangle())
                 
                 Text(postData.likes.formatted(.number.notation(.compactName)))
@@ -46,7 +47,7 @@ struct PostElementView: View {
                     showComment.toggle()
                 }) {
                     Image(systemName: "bubble")
-                }.foregroundStyle(.black)
+                }.foregroundStyle(colorScheme == .dark ? .white : .black)
                     .contentShape(Rectangle())
                     .sheet(isPresented: $showComment) {
                         CommentListView(postId: postData.id)
