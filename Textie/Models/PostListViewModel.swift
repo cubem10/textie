@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PostListViewModel: APICaller, ObservableObject {
+class PostListViewModel: ObservableObject {
     @Published var isLoading = false
     
     private var offset: Int = 0
@@ -19,8 +19,6 @@ class PostListViewModel: APICaller, ObservableObject {
         self.offset = offset
         self.limit = limit
         self.postDatas = []
-        
-        super.init()
     }
     
     func loadPost() async {

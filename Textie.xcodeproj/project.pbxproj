@@ -35,7 +35,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F69934772DCE51EE00EEB078 /* Exceptions for "Textie" folder in "Textie" target */ = {
+		F685B7FD2DD76FC900A7E9B3 /* Exceptions for "Textie" folder in "Textie" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -45,10 +45,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		F6FCFFCC2DBF89B5009252D8 /* Textie */ = {
+		F685B7EB2DD76FC900A7E9B3 /* Textie */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F69934772DCE51EE00EEB078 /* Exceptions for "Textie" folder in "Textie" target */,
+				F685B7FD2DD76FC900A7E9B3 /* Exceptions for "Textie" folder in "Textie" target */,
 			);
 			path = Textie;
 			sourceTree = "<group>";
@@ -94,7 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				F61077B12DD659C50069D101 /* Localizable.xcstrings */,
-				F6FCFFCC2DBF89B5009252D8 /* Textie */,
+				F685B7EB2DD76FC900A7E9B3 /* Textie */,
 				F6FCFFDD2DBF89B6009252D8 /* TextieTests */,
 				F6FCFFE72DBF89B6009252D8 /* TextieUITests */,
 				F6FCFFCB2DBF89B5009252D8 /* Products */,
@@ -127,7 +127,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				F6FCFFCC2DBF89B5009252D8 /* Textie */,
+				F685B7EB2DD76FC900A7E9B3 /* Textie */,
 			);
 			name = Textie;
 			packageProductDependencies = (

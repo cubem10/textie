@@ -17,7 +17,7 @@ struct LoginView: View {
     @State private var showRegisterView = false
     @State private var loginFailed: Bool = false
 
-    
+    @Environment(UserStateViewModel.self) var userStateViewModel
     
     var body: some View {
         VStack {
@@ -31,7 +31,7 @@ struct LoginView: View {
                 Button(action: {
                     Task {
                         do {
-                            try await login(username: username, password: password)
+                            try await userStateViewModel.login(username: username, password: password)
                         } catch {
                             loginFailed = true
                         }
@@ -49,7 +49,7 @@ struct LoginView: View {
                         .onChange(of: showRegisterView) {
                             Task {
                                 do {
-                                    try await login(username: username, password: password)
+                                    try await userStateViewModel.login(username: username, password: password)
                                 } catch {
                                     loginFailed = true
                                 }

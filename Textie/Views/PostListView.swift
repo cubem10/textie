@@ -9,12 +9,13 @@ import SwiftUI
 
 struct PostListView: View {
     @StateObject private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
+    @Environment(UserStateViewModel.self) var userStateViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
             Button(action: {
-                let isAccessTokenRemoved: Bool = saveTokenToKeychain(token: "", key: "access_token")
-                let isRefreshTokenRemoved: Bool = saveTokenToKeychain(token: "", key: "refresh_token")
+                let isAccessTokenRemoved: Bool = userStateViewModel.saveTokenToKeychain(token: "", key: "access_token")
+                let isRefreshTokenRemoved: Bool = userStateViewModel.saveTokenToKeychain(token: "", key: "refresh_token")
                 
                 if isAccessTokenRemoved && isRefreshTokenRemoved {
                     print("Logged out successfully")

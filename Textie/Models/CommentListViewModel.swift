@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CommentListViewModel: APICaller, ObservableObject {
+class CommentListViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     
     private var offset: Int = 0
@@ -18,8 +18,6 @@ class CommentListViewModel: APICaller, ObservableObject {
     init(offset: Int, limit: Int) {
         self.offset = offset
         self.limit = limit
-        
-        super.init()
     }
     
     func loadComments(postId: UUID) async {

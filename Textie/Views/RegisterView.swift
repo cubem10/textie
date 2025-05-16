@@ -17,6 +17,8 @@ struct RegisterView: View {
     @State private var verifyPassword: String = ""
     @State private var existingUser: Bool = false
     
+    @Environment(UserStateViewModel.self) var userStateViewModel
+    
     var body: some View {
         VStack {
             Text("REGISTER_MAIN_TEXT")
@@ -30,7 +32,7 @@ struct RegisterView: View {
             Divider()
             NicknameFieldView(nickname: $nickname).padding()
             HStack {
-                Button(action: { Task { try? await register(username: username, password: password, nickname: nickname, onError: { error in
+                Button(action: { Task { try? await userStateViewModel.register(username: username, password: password, nickname: nickname, onError: { error in
                     if case BackendError.existingUserRegistration = error {
                         existingUser = true
                     }

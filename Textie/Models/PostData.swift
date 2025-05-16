@@ -72,22 +72,6 @@ struct CommentDataDTO: Identifiable, Decodable {
     }
 }
 
-//extension CommentDataDTO {
-//    static func parse(comments: Data) throws -> [CommentDataDTO] {
-//        var commentDataDTOs: [CommentDataDTO] = []
-//        
-//        do {
-//            let decodedResponse = try JSONDecoder().decode([CommentDataDTO].self, from: comments)
-//            for comment in decodedResponse {
-//                commentDataDTOs.append(comment)
-//            }
-//        } catch {
-//            print("An error occurred while parsing JSON: \(error)")
-//        }
-//        
-//        return commentDataDTOs
-//    }
-//}
 
 struct CommentData: Identifiable, Decodable {
     let id: UUID

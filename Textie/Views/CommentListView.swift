@@ -10,7 +10,7 @@ import SwiftUI
 struct CommentListView: View {
     var postId: UUID
     @StateObject var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
-    
+    @State var newComment: String = ""
     var body: some View {
         VStack {
             Text("COMMENTS")
@@ -29,7 +29,6 @@ struct CommentListView: View {
                     .listStyle(.plain)
                 }
             }
-            
         }.padding()
         .task {
             await viewModel.loadComments(postId: postId)

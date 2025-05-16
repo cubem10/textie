@@ -9,14 +9,12 @@ import SwiftUI
 
 @main
 struct TextieApp: App {
+    @State private var userStateViewModel: UserStateViewModel = .init()
     
     var body: some Scene {
         WindowGroup {
-            if let accessToken = getTokenFromKeychain(key: "access_token"), accessToken != "" {
-                PostListView()
-            } else {
-                LoginView()
-            }
+            LoginView()
+                .environment(userStateViewModel)
         }
     }
 }
