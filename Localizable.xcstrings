@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "⋅" : {
+
+    },
     "COMMENT_WRITE_PLACEHOLDER" : {
       "localizations" : {
         "en" : {

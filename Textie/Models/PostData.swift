@@ -30,6 +30,8 @@ struct PostDataDTO: Identifiable, Decodable {
 struct PostData: Identifiable, Decodable {
     let id: UUID
     let name: String
+    let title: String
+    let createdAt: Date
     
     var content: String
     var likes: Int
@@ -39,10 +41,21 @@ extension PostData {
     static func construct(post: PostDataDTO, likes: Int = 0) -> PostData {
         return PostData(
             id: post.id,
-            name: post.userId.uuidString, // MARK: need to implement API that fetches username with UUID
+            name: post.userId.uuidString, 
+            title: post.title,
+            createdAt: String.dateFromString(post.createdAt),
             content: post.content,
             likes: likes
         )
+    }
+}
+
+extension String {
+    static func dateFromString(_ dateString: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        return dateFormatter.date(from: dateString)!
     }
 }
 

@@ -19,8 +19,14 @@ struct PostElementView: View {
                 ProfileImageView().frame(width: 30, height: 30)
                 Text(postData.name)
                     .lineLimit(1)
+                Text("⋅")
+                Text(postData.createdAt, style: .date)
+                    .font(.subheadline)
             }.frame(height: 30)
                 .padding(.vertical, 5)
+            Text(postData.title)
+                .font(.title2)
+                .fontWeight(.bold)
             Text(postData.content)
                 .padding(.bottom)
                 .lineLimit(nil)
@@ -52,5 +58,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", content: "Post content goes here. ", likes: 1234567890))
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), content: "Post content goes here. ", likes: 1234567890))
 }
