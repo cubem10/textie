@@ -56,6 +56,8 @@ class ProfileViewModel {
         username = decodedResponse.username
         nickname = decodedResponse.nickname
         
+        posts.removeAll()
+        
         for post in postDTOs {
             posts.append(PostData.construct(post: post))
         }

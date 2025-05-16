@@ -38,6 +38,7 @@ class CommentListViewModel: ObservableObject {
             return
         }
         
+        comments.removeAll()
         
         for comment in decodedComments.comments {
             comments.append(CommentData.construct(comment: comment))

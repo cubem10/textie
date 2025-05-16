@@ -41,6 +41,8 @@ class PostListViewModel: ObservableObject {
             return
         }
         
+        postDatas.removeAll()
+        
         for postDataDTO in decodedPostResponse {
             guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
                 print("An error occurred while fetching likes.")
