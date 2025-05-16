@@ -55,9 +55,6 @@
     "LOADING_TEXT" : {
 
     },
-    "Loading..." : {
-
-    },
     "Log out" : {
 
     },
@@ -94,6 +91,9 @@
           }
         }
       }
+    },
+    "LOGIN_LOADING_MESSAGE" : {
+
     },
     "LOGIN_MAIN_TEXT" : {
       "extractionState" : "manual",
@@ -162,6 +162,9 @@
           }
         }
       }
+    },
+    "POST_LOADING_MESSAGE" : {
+
     },
     "Posts" : {
 

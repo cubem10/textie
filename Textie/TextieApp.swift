@@ -13,7 +13,7 @@ struct TextieApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            RootView()
                 .environment(userStateViewModel)
         }
     }

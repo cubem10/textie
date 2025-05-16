@@ -13,36 +13,37 @@ struct PostListView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Button(action: {
-                let isAccessTokenRemoved: Bool = userStateViewModel.saveTokenToKeychain(token: "", key: "access_token")
-                let isRefreshTokenRemoved: Bool = userStateViewModel.saveTokenToKeychain(token: "", key: "refresh_token")
-                
-                if isAccessTokenRemoved && isRefreshTokenRemoved {
-                    print("Logged out successfully")
-                }
-            }) {
-                Text("Log out")
-            }
-            
-            Text("Posts")
-                .font(.title)
-                .fontWeight(.bold)
-            
             Group {
                 if viewModel.isLoading {
-                    ProgressView("Loading...")
-                } else {
+                    ProgressView("POST_LOADING_MESSAGE")
+                }
+                else {
+                    HStack {
+                        Text("Posts")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Spacer()
+                        Button(action: {
+                            Task {
+                                let logoutStatus: Bool = await userStateViewModel.logout()
+                                print("logoutStatus: \(logoutStatus)")
+                            }
+                        }) {
+                            Text("Log out")
+                        }
+                    }
+                    
                     let posts = viewModel.postDatas
                     List(posts) { postData in
                         PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
                     }.listStyle(.plain)
                 }
+                    
             }
-            
-            }
-            .padding()
-            .task {
-                await viewModel.loadPost()
+        }
+        .padding()
+        .task {
+            await viewModel.loadPost()
         }
     }
 }

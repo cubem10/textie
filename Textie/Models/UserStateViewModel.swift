@@ -10,6 +10,24 @@ import Foundation
 @Observable
 class UserStateViewModel {
     var isLoggedIn: Bool = false
+    var isLoading: Bool = false
+    
+    init() {
+        Task {
+            isLoading = true
+            defer { isLoading = false }
+            
+            do {
+                let refreshResult: Bool = try await refreshSession()
+                if refreshResult {
+                    isLoggedIn = true
+                    print("Session refreshed, user is logged in. isLoggined: \(isLoggedIn)")
+                }
+            } catch {
+                print("An error occurred while refreshing session: \(error)")
+            }
+        }
+    }
     
     func saveTokenToKeychain(token: String, key: String) -> Bool {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
@@ -68,6 +86,9 @@ class UserStateViewModel {
         do {
             parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
             await MainActor.run {
+                isLoading = true
+                defer { isLoading = false }
+                
                 isLoggedIn = true
             }
         } catch {
@@ -85,13 +106,20 @@ class UserStateViewModel {
             }
             
             parseTokenResponse(encodedResponse: response.0)
+            
+            await MainActor.run {
+                isLoading = true
+                defer { isLoading = false }
+                
+                isLoggedIn = true
+            }
         } catch {
             onError(error)
         }
         
     }
 
-    func refreshSession() async throws {
+    func refreshSession() async throws -> Bool {
         var accessToken: String = ""
         
         guard let refreshToken = getTokenFromKeychain(key: "refresh_token") else {
@@ -105,11 +133,14 @@ class UserStateViewModel {
                 
                 if accessToken != "" && saveTokenToKeychain(token: accessToken, key: "access_token") {
                     print("Access Token saved successfully")
+                    return true
                 } else {
                     print("An error occurred while saving access token")
+                    return false
                 }
             } catch {
                 print("Failed to decode refresh token response: \(error)")
+                return false
             }
         } else {
             throw BackendError.invaildResponse
@@ -135,6 +166,9 @@ class UserStateViewModel {
         let refreshTokenStatus = SecItemCopyMatching(refreshTokenQuery as CFDictionary, nil)
         
         await MainActor.run {
+            isLoading = true
+            defer { isLoading = false }
+            
             isLoggedIn = false
         }
         
