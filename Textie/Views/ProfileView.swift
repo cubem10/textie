@@ -39,7 +39,6 @@ struct ProfileView: View {
                                     Image(systemName: "document.on.document.fill").scaleEffect(0.7)
                                 }
                             }.foregroundStyle(.black)
-                            Spacer()
                         }
                         Spacer()
                         if isMyProfile {

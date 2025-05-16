@@ -38,10 +38,30 @@
       }
     },
     "EDIT_DONE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
     },
     "EDIT_PROFILE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집"
+          }
+        }
+      }
     },
     "INVAILD_CREDENTIAL_DETAILS" : {
       "extractionState" : "manual",
@@ -177,7 +197,20 @@
       }
     },
     "NICKNAME" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nickname"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닉네임"
+          }
+        }
+      }
     },
     "NICKNAME_PLACEHOLDER" : {
       "extractionState" : "manual",
