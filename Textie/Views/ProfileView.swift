@@ -10,9 +10,11 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(UserStateViewModel.self) var userStateViewModel
     @State private var viewModel: ProfileViewModel = .init()
+    @State private var editingProfile: Bool = false
     var uuid: UUID
     
     var body: some View {
+        let isMyProfile: Bool = uuid == userStateViewModel.uuid
         VStack(alignment: .leading) {
             Group {
                 if viewModel.isLoading {
@@ -40,13 +42,23 @@ struct ProfileView: View {
                             Spacer()
                         }
                         Spacer()
-                        Button(action: {
-                            Task {
-                                let logoutStatus: Bool = await userStateViewModel.logout()
-                                print("logoutStatus: \(logoutStatus)")
+                        if isMyProfile {
+                            VStack {
+                                Button(action: {
+                                    Task {
+                                        let logoutStatus: Bool = await userStateViewModel.logout()
+                                        print("logoutStatus: \(logoutStatus)")
+                                    }
+                                }) {
+                                    Text("LOGOUT")
+                                }
+                                .padding()
+                                Button(action: {
+                                    editingProfile.toggle()
+                                }) {
+                                    Text("EDIT_PROFILE")
+                                }
                             }
-                        }) {
-                            Text("LOGOUT")
                         }
                     }
                     .frame(height: 75)
@@ -61,6 +73,9 @@ struct ProfileView: View {
         }
         .task {
             await viewModel.loadUser(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "", uuid: uuid)
+        }
+        .sheet(isPresented: $editingProfile) {
+            ProfileEditView(newNickname: viewModel.nickname)
         }
     }
 }

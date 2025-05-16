@@ -37,6 +37,12 @@
         }
       }
     },
+    "EDIT_DONE" : {
+
+    },
+    "EDIT_PROFILE" : {
+
+    },
     "INVAILD_CREDENTIAL_DETAILS" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -169,6 +175,9 @@
           }
         }
       }
+    },
+    "NICKNAME" : {
+
     },
     "NICKNAME_PLACEHOLDER" : {
       "extractionState" : "manual",

@@ -10,18 +10,19 @@ import SwiftUI
 struct MainView: View {
     @Environment(UserStateViewModel.self) var viewModel
     @State private var timer: Timer?
+    @SceneStorage("selectedTab") private var selection: Int = 0
     
     var body: some View {
-        TabView {
-            Tab("POST_TITLE", systemImage: "newspaper.fill") {
+        TabView(selection: $selection) {
+            Tab("POST_TITLE", systemImage: "newspaper.fill", value: 0) {
                 PostListView()
             }
             
-            Tab("POST_WRITE_TITLE", systemImage: "square.and.pencil") {
+            Tab("POST_WRITE_TITLE", systemImage: "square.and.pencil", value: 1) {
                 PostWriteView()
             }
             
-            Tab("PROFILE_TITLE", systemImage: "person.crop.circle.fill") {
+            Tab("PROFILE_TITLE", systemImage: "person.crop.circle.fill", value: 2) {
                 ProfileView(uuid: viewModel.uuid)
             }
             
