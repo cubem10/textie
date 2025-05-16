@@ -31,7 +31,7 @@ struct PostData: Identifiable, Decodable {
     let id: UUID
     let name: String
     let title: String
-    let createdAt: Date
+    let createdAt: String
     
     var content: String
     var likes: Int
@@ -43,7 +43,7 @@ extension PostData {
             id: post.id,
             name: post.userId.uuidString, 
             title: post.title,
-            createdAt: String.dateFromString(post.createdAt),
+            createdAt: String.formatRelativeDate(post.createdAt),
             content: post.content,
             likes: likes
         )
@@ -51,11 +51,16 @@ extension PostData {
 }
 
 extension String {
-    static func dateFromString(_ dateString: String) -> Date {
+    static func formatRelativeDate(_ dateString: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        return dateFormatter.date(from: dateString)!
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        let date = dateFormatter.date(from: dateString)!
+        
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

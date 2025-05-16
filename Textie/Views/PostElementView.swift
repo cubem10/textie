@@ -20,7 +20,7 @@ struct PostElementView: View {
                 Text(postData.name)
                     .lineLimit(1)
                 Text("⋅")
-                Text(postData.createdAt, style: .date)
+                Text(postData.createdAt)
                     .font(.subheadline)
             }.frame(height: 30)
                 .padding(.vertical, 5)
@@ -58,5 +58,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), content: "Post content goes here. ", likes: 1234567890))
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", content: "Post content goes here. ", likes: 1234567890))
 }
