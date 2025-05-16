@@ -9,9 +9,9 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(UserStateViewModel.self) var userStateViewModel
-        
     @State private var viewModel: ProfileViewModel = .init()
-        
+    var uuid: UUID
+    
     var body: some View {
         VStack(alignment: .leading) {
             Group {
@@ -51,11 +51,11 @@ struct ProfileView: View {
             }
         }
         .task {
-            await viewModel.loadUser(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "")
+            await viewModel.loadUser(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "", uuid: uuid)
         }
     }
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(uuid: UUID())
 }

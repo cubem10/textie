@@ -12,9 +12,12 @@ class UserStateViewModel {
     var isLoggedIn: Bool = false
     var isLoading: Bool = false
     
+    var uuid: UUID = UUID()
+    
     init() {
         Task {
             do {
+                uuid = await getUUID()!
                 let refreshResult: Bool = try await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
@@ -155,5 +158,27 @@ class UserStateViewModel {
         isLoggedIn = false
         
         return accessTokenStatus == errSecSuccess && refreshTokenStatus == errSecSuccess
+    }
+    
+    @MainActor
+    func getUUID() async -> UUID? {
+        isLoading = true
+        defer { isLoading = false }
+        
+        print("getUUID started")
+        let accessToken = getTokenFromKeychain(key: "access_token") ?? ""
+        
+        do {
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user", httpMethod: "GET", withToken: accessToken)
+            let decodedResponse = try JSONDecoder().decode(UserProfileDTO.self, from: response)
+            print(decodedResponse.id)
+            return decodedResponse.id
+        }
+        catch {
+            print("An error occurred while fetching the user uuid: \(error)")
+            return nil
+        }
+            
+        
     }
 }

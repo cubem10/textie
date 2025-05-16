@@ -7,12 +7,6 @@
 
 import Foundation
 
-struct UserProfile: Identifiable {
-    let id: UUID
-    var name: String
-    var userId: String
-}
-
 struct UserProfileDTO: Identifiable, Decodable {
     let id: UUID
     let username: String

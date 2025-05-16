@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainView: View {
+    @Environment(UserStateViewModel.self) var viewModel
+    
     var body: some View {
         TabView {
             Tab("POST_TITLE", systemImage: "newspaper.fill") {
@@ -19,8 +21,9 @@ struct MainView: View {
             }
             
             Tab("PROFILE_TITLE", systemImage: "person.crop.circle.fill") {
-                ProfileView()
+                ProfileView(uuid: viewModel.uuid)
             }
+            
         }
     }
 }

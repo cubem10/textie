@@ -18,10 +18,10 @@ class ProfileViewModel {
     var nickname: String = ""
     var posts: [PostData] = []
     
-    func loadUserPosts(uuid: UUID) async -> [PostDataDTO] {
+    func loadUserPosts(token: String, uuid: UUID) async -> [PostDataDTO] {
         var postDataDTOs: [PostDataDTO] = []
         
-        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts", httpMethod: "GET") else {
+        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts", httpMethod: "GET", withToken: token) else {
             print("An error occurred while fetching posts.")
             return postDataDTOs
         }
@@ -35,24 +35,23 @@ class ProfileViewModel {
         return postDataDTOs
     }
     
-    func loadUser(token: String) async {
+    func loadUser(token: String, uuid: UUID) async {
         await MainActor.run {
             isLoading = true
         }
         
-        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/user", httpMethod: "GET", withToken: token) else {
+        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/user/\(uuid)", httpMethod: "GET", withToken: token) else {
             print("An error occurred while fetching user info. ")
             return
         }
         
         guard let decodedResponse: UserProfileDTO = try? JSONDecoder().decode(UserProfileDTO.self, from: response) else {
             print("An error occurred while decoding user profile information.")
-            print(token)
             print(String(data: response, encoding: .utf8) ?? "")
             return
         }
         
-        let postDTOs = await loadUserPosts(uuid: decodedResponse.id)
+        let postDTOs = await loadUserPosts(token: token, uuid: decodedResponse.id)
         username = decodedResponse.username
         nickname = decodedResponse.nickname
         
