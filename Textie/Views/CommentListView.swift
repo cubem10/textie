@@ -19,7 +19,10 @@ struct CommentListView: View {
             Divider()
             Group {
                 if viewModel.isLoading {
-                    ProgressView("LOADING_TEXT")
+                    ProgressView("LOADING_MESSAGE")
+                }
+                else if viewModel.comments.isEmpty {
+                    Text("NO_COMMENTS_MESSAGE")
                 }
                 else {
                     List(viewModel.comments) { commentData in
@@ -28,6 +31,7 @@ struct CommentListView: View {
                     }
                     .listStyle(.plain)
                 }
+                Spacer()
             }
         }.padding()
         .task {

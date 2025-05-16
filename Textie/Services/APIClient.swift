@@ -7,13 +7,15 @@
 
 import Foundation
 
-func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withCredential credential: Credential = Credential(username: "", password: "")) async throws -> (Data, URLResponse) {
+func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withToken token: String = "") async throws -> (Data, URLResponse) {
     guard let url = URL(string: endpoint) else {
         throw BackendError.badURL
     }
     
     var request = URLRequest(url: url)
     request.httpMethod = method
+    request.addValue("application/json", forHTTPHeaderField: "Accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     do {
         let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)

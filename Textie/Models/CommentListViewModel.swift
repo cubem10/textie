@@ -26,7 +26,24 @@ class CommentListViewModel: ObservableObject {
             isLoading = true
         }
         
-        self.comments = await fetchComments(offset: 0, limit: 10, forPostWithId: postId)
+        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") else {
+            print("An error occurred while fetching comments.")
+            return
+        }
+        
+        print(String(data: response, encoding: .utf8) ?? "")
+        
+        guard let decodedComments: CommentResponseDTO = try? JSONDecoder().decode(CommentResponseDTO.self, from: response) else {
+            print("An error occurred while decoding comments.")
+            return
+        }
+        
+        
+        for comment in decodedComments.comments {
+            comments.append(CommentData.construct(comment: comment))
+        }
+
+        print("Comments: \(comments)")
         
         await MainActor.run {
             isLoading = false

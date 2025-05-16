@@ -16,6 +16,8 @@ struct PostListView: View {
             Group {
                 if viewModel.isLoading {
                     ProgressView("POST_LOADING_MESSAGE")
+                } else if viewModel.postDatas.isEmpty {
+                    Text("NO_POST_MESSAGE")
                 }
                 else {
                     HStack {
@@ -38,7 +40,7 @@ struct PostListView: View {
                         PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
                     }.listStyle(.plain)
                 }
-                    
+                Spacer()
             }
         }
         .padding()

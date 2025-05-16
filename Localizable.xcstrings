@@ -52,7 +52,7 @@
         }
       }
     },
-    "LOADING_TEXT" : {
+    "LOADING_MESSAGE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -168,6 +168,38 @@
         }
       }
     },
+    "NO_COMMENTS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No comment"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "댓글 없음"
+          }
+        }
+      }
+    },
+    "NO_POST_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No post"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 없음"
+          }
+        }
+      }
+    },
     "PASSWORD_PLACEHOLDER" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -278,6 +310,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "새로운 게시글 작성"
+          }
+        }
+      }
+    },
+    "PROFILE_LOADING_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading Profile…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로필 불러오는 중…"
           }
         }
       }

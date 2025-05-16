@@ -13,11 +13,8 @@ struct UserProfile: Identifiable {
     var userId: String
 }
 
-@Observable
-class ProfileManager {
-    var profile: UserProfile?
-    
-    func loadProfile(_ userSession: UserSession) {
-        // TODO: implement profile loading API call
-    }
+struct UserProfileDTO: Identifiable, Decodable {
+    let id: UUID
+    let username: String
+    let nickname: String
 }

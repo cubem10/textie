@@ -28,7 +28,34 @@ class PostListViewModel: ObservableObject {
             isLoading = true
         }
         
-        self.postDatas = await fetchPost()
+        print("fetchPost started")
+        
+        guard let (postResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") else {
+            print("An error occurred while fetching posts.")
+            return
+        }
+        
+        guard let decodedPostResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: postResponseData) else {
+            print("An error occurred while decoding posts data.")
+            print(String(data: postResponseData, encoding: .utf8) ?? "")
+            return
+        }
+        
+        for postDataDTO in decodedPostResponse {
+            guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
+                print("An error occurred while fetching likes.")
+                return
+            }
+            
+            guard let decodedLikesResponse: LikeDataDTO = try? JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData) else {
+                print("An error occurred while decoding likes data.")
+                return
+            }
+            
+            postDatas.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount))
+        }
+        
+        
         await MainActor.run {
             isLoading = false
         }
