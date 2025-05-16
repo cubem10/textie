@@ -20,7 +20,7 @@ class CommentListViewModel: ObservableObject {
         self.limit = limit
     }
     
-    func loadComments(postId: UUID) async {
+    func loadComments(postId: UUID, token: String) async {
         print("Loading comments...")
         await MainActor.run {
             isLoading = true
@@ -41,7 +41,7 @@ class CommentListViewModel: ObservableObject {
         comments.removeAll()
         
         for comment in decodedComments.comments {
-            comments.append(CommentData.construct(comment: comment))
+            await comments.append(CommentData.construct(comment: comment, token: token))
         }
 
         print("Comments: \(comments)")

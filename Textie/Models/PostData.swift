@@ -106,15 +106,26 @@ struct CommentDataDTO: Identifiable, Decodable {
 struct CommentData: Identifiable, Decodable {
     let id: UUID
     let name: String
-    
+    let createdAt: String
     var content: String
 }
 
 extension CommentData {
-    static func construct(comment: CommentDataDTO) -> CommentData {
+    static func construct(comment: CommentDataDTO, token: String) async -> CommentData  {
+        var nickname: String = ""
+        
+        do {
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(comment.userId)", httpMethod: "GET", withToken: token)
+            let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
+            nickname = decodedResponse.nickname
+        } catch {
+            print("An error occurred while fetching user profile. Error: \(error)")
+        }
+        
         return CommentData(
             id: comment.id,
-            name: comment.userId.uuidString, // MARK: need to implement API that fetches username with UUID
+            name: nickname,
+            createdAt: String.formatRelativeDate(comment.createdAt),
             content: comment.content
         )
     }
