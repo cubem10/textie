@@ -42,21 +42,7 @@ struct PostElementView: View {
                 }.foregroundStyle(.black)
                     .contentShape(Rectangle())
                     .sheet(isPresented: $showComment) {
-                        VStack {
-                            Text("COMMENTS")
-                                .font(.title)
-                                .fontWeight(.bold)
-                            Divider()
-                            List(commentDatas) { commentData in
-                                CommentElementView(commentData: commentData)
-                                    .listRowInsets(EdgeInsets())
-                            }
-                            .listStyle(.plain)
-                            .task {
-                                commentDatas = await fetchComments(forPostWithId: postData.id)
-                            }
-                            
-                        }.padding()
+                        CommentListView(postId: postData.id)
                     }
             }
         }

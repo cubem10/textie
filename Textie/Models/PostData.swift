@@ -46,6 +46,16 @@ extension PostData {
     }
 }
 
+struct CommentResponseDTO: Decodable {
+    let postId: UUID
+    let comments: [CommentDataDTO]
+    
+    enum CodingKeys: String, CodingKey {
+        case postId = "post_id"
+        case comments
+    }
+}
+
 struct CommentDataDTO: Identifiable, Decodable {
     let createdAt: String
     let postId: UUID
@@ -62,12 +72,38 @@ struct CommentDataDTO: Identifiable, Decodable {
     }
 }
 
+//extension CommentDataDTO {
+//    static func parse(comments: Data) throws -> [CommentDataDTO] {
+//        var commentDataDTOs: [CommentDataDTO] = []
+//        
+//        do {
+//            let decodedResponse = try JSONDecoder().decode([CommentDataDTO].self, from: comments)
+//            for comment in decodedResponse {
+//                commentDataDTOs.append(comment)
+//            }
+//        } catch {
+//            print("An error occurred while parsing JSON: \(error)")
+//        }
+//        
+//        return commentDataDTOs
+//    }
+//}
+
 struct CommentData: Identifiable, Decodable {
     let id: UUID
     let name: String
-    let profileImageURL: URL?
     
     var content: String
+}
+
+extension CommentData {
+    static func construct(comment: CommentDataDTO) -> CommentData {
+        return CommentData(
+            id: comment.id,
+            name: comment.userId.uuidString, // MARK: need to implement API that fetches username with UUID
+            content: comment.content
+        )
+    }
 }
 
 struct LikeDataDTO: Decodable {
@@ -113,11 +149,27 @@ func fetchPost(offset: Int = 0, limit: Int = 10) async -> [PostData] {
     return postDatas
 }
 
-func fetchComments(forPostWithId postId: UUID) async -> [CommentData] {
-    // TODO: implement API call
+func fetchComments(offset: Int, limit: Int, forPostWithId postId: UUID) async -> [CommentData] {
+    print("Fetching comments...")
+    var comments: [CommentData] = []
     
-    return [
-        CommentData(id: UUID(), name: "Jane Doe", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Hello!"),
-        CommentData(id: UUID(), name: "John Doe", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "Hi!"),
-    ]
+    guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") else {
+        print("An error occurred while fetching comments.")
+        return comments
+    }
+    
+    print(String(data: response, encoding: .utf8) ?? "")
+    
+    guard let decodedComments: CommentResponseDTO = try? JSONDecoder().decode(CommentResponseDTO.self, from: response) else {
+        print("An error occurred while decoding comments.")
+        return comments
+    }
+    
+    
+    for comment in decodedComments.comments {
+        comments.append(CommentData.construct(comment: comment))
+    }
+
+    print("Comments: \(comments)")
+    return comments
 }

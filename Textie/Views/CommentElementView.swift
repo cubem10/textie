@@ -26,5 +26,5 @@ struct CommentElementView: View {
 }
 
 #Preview {
-    CommentElementView(commentData: CommentData(id: UUID(), name: "John", profileImageURL: URL(string: "https://example.com/john.jpg")!, content: "placeholder text"))
+    CommentElementView(commentData: CommentData(id: UUID(), name: "John", content: "placeholder text"))
 }
