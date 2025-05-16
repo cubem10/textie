@@ -50,4 +50,12 @@ class CommentListViewModel: ObservableObject {
             isLoading = false
         }
     }
+    
+    func addComment(postId: UUID, token: String, content: String) async {
+        do {
+            let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?content=\(content)", httpMethod: "POST", withToken: token)
+        } catch {
+            print("An error occurred while posting comments: \(error)")
+        }
+    }
 }

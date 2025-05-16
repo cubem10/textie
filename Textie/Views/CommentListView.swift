@@ -11,6 +11,7 @@ struct CommentListView: View {
     var postId: UUID
     @StateObject var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
     @State var newComment: String = ""
+    @Environment(UserStateViewModel.self) var userStateViewModel
     var body: some View {
         VStack {
             Text("COMMENTS")
@@ -32,6 +33,17 @@ struct CommentListView: View {
                     .listStyle(.plain)
                 }
                 Spacer()
+                HStack {
+                    TextField("COMMENT_WRITE_PLACEHOLDER", text: $newComment)
+                    Button(action: {
+                        Task {
+                            await viewModel.addComment(postId: postId, token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "", content: newComment)
+                            await viewModel.loadComments(postId: postId)
+                        }
+                    }) {
+                        Image(systemName: "paperplane.fill")
+                    }
+                }
             }
         }.padding()
         .task {
@@ -41,5 +53,5 @@ struct CommentListView: View {
 }
 
 #Preview {
-    CommentListView(postId: UUID())
+    CommentListView(postId: UUID()).environment(UserStateViewModel())
 }

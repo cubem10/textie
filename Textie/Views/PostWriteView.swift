@@ -8,32 +8,53 @@
 import SwiftUI
 
 struct PostWriteView: View {
-    @State var text: String = ""
-    
+    @State var title: String = ""
+    @State var context: String = ""
+    @Environment(UserStateViewModel.self) var userStateViewModel
     var body: some View {
         VStack {
             HStack {
                 Spacer()
                 Button(action: {
-                    // TODO: implement API call
+                    Task {
+                        do {
+                            let token = userStateViewModel.getTokenFromKeychain(key: "access_token") ?? ""
+                            let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: token)
+                        } catch {
+                            print("An error occurred while posting: \(error)")
+                        }
+                    }
                 }) {
                     Text("POST_WRITE_SUBMIT")
                 }
             }
             ZStack {
-                TextEditor(text: $text)
-                
-                if text.isEmpty {
-                    Text("POST_WRITE_PLACEHOLDER")
+                TextField(String(""), text: $title)
+                    .padding(EdgeInsets())
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 4).stroke(Color.black, lineWidth: 1)
+                    }
+                if title.isEmpty {
+                    Text("POST_WRITE_TITLE_PLACEHOLDER").foregroundStyle(Color.gray)
                 }
-            }   .overlay {
-                    RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1)
-                }
-            Spacer()
+            }
+        Spacer()
+        ZStack {
+            TextEditor(text: $context).padding(EdgeInsets())
+
+            if context.isEmpty {
+                Text("POST_WRITE_PLACEHOLDER")
+                    .foregroundColor(Color.gray)
+            }
+        }
+        .overlay {
+                RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1)
+        }
+        Spacer()
         }.padding()
     }
 }
 
 #Preview {
-    PostWriteView()
+    PostWriteView().environment(UserStateViewModel())
 }

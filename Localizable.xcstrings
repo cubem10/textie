@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "COMMENT_WRITE_PLACEHOLDER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write Comments Here"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "댓글 작성하기"
+          }
+        }
+      }
+    },
     "COMMENTS" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -310,6 +326,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "새로운 게시글 작성"
+          }
+        }
+      }
+    },
+    "POST_WRITE_TITLE_PLACEHOLDER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제목"
           }
         }
       }

@@ -17,7 +17,7 @@ class UserStateViewModel {
     init() {
         Task {
             do {
-                uuid = await getUUID()!
+                uuid = await getUUID() ?? UUID()
                 let refreshResult: Bool = try await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
