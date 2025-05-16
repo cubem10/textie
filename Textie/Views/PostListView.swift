@@ -45,7 +45,7 @@ struct PostListView: View {
         }
         .padding()
         .task {
-            await viewModel.loadPost()
+            await viewModel.loadPost(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "")
         }
     }
 }

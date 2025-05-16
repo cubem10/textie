@@ -58,7 +58,7 @@ class ProfileViewModel {
         posts.removeAll()
         
         for post in postDTOs {
-            posts.append(PostData.construct(post: post))
+            await posts.append(PostData.construct(post: post, token: token))
         }
         
         await MainActor.run {

@@ -38,10 +38,22 @@ struct PostData: Identifiable, Decodable {
 }
 
 extension PostData {
-    static func construct(post: PostDataDTO, likes: Int = 0) -> PostData {
+    static func construct(post: PostDataDTO, likes: Int = 0, token: String) async -> PostData {
+        var nickname: String = ""
+        
+        
+        do {
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(post.userId)", httpMethod: "GET", withToken: token)
+            let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
+            nickname = decodedResponse.nickname
+        } catch {
+            print("An error occurred while fetching user profile. Error: \(error)")
+        }
+        
+        
         return PostData(
             id: post.id,
-            name: post.userId.uuidString, 
+            name: nickname,
             title: post.title,
             createdAt: String.formatRelativeDate(post.createdAt),
             content: post.content,

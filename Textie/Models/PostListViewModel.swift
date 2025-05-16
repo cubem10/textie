@@ -21,7 +21,7 @@ class PostListViewModel: ObservableObject {
         self.postDatas = []
     }
     
-    func loadPost() async {
+    func loadPost(token: String) async {
         print("loadPost called")
         
         await MainActor.run {
@@ -54,7 +54,7 @@ class PostListViewModel: ObservableObject {
                 return
             }
             
-            postDatas.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount))
+            await postDatas.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
         }
         
         

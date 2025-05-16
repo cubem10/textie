@@ -39,7 +39,7 @@ struct PostElementView: View {
                 }
                 .foregroundStyle(.black)
                 .contentShape(Rectangle())
-                .background(Color.red.opacity(0.2))
+                
                 Text(postData.likes.formatted(.number.notation(.compactName)))
                     .lineLimit(1)
                 Button(action: {
