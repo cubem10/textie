@@ -19,7 +19,7 @@ struct PostListView: View {
                 }
                 else {
                     HStack {
-                        Text("Posts")
+                        Text("POST_TITLE")
                             .font(.title)
                             .fontWeight(.bold)
                         Spacer()
@@ -29,7 +29,7 @@ struct PostListView: View {
                                 print("logoutStatus: \(logoutStatus)")
                             }
                         }) {
-                            Text("Log out")
+                            Text("LOGOUT")
                         }
                     }
                     

@@ -16,7 +16,7 @@ struct RootView: View {
                 ProgressView("LOGIN_LOADING_MESSAGE")
             }
             else if userStateViewModel.isLoggedIn {
-                PostListView()
+                MainView()
             } else {
                 LoginView()
             }
