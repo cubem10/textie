@@ -25,14 +25,6 @@ struct PostListView: View {
                             .font(.title)
                             .fontWeight(.bold)
                         Spacer()
-                        Button(action: {
-                            Task {
-                                let logoutStatus: Bool = await userStateViewModel.logout()
-                                print("logoutStatus: \(logoutStatus)")
-                            }
-                        }) {
-                            Text("LOGOUT")
-                        }
                     }
                     
                     let posts = viewModel.postDatas

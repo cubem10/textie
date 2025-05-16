@@ -39,6 +39,15 @@ struct ProfileView: View {
                             }.foregroundStyle(.black)
                             Spacer()
                         }
+                        Spacer()
+                        Button(action: {
+                            Task {
+                                let logoutStatus: Bool = await userStateViewModel.logout()
+                                print("logoutStatus: \(logoutStatus)")
+                            }
+                        }) {
+                            Text("LOGOUT")
+                        }
                     }
                     .frame(height: 75)
                     .padding()
@@ -57,5 +66,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(uuid: UUID())
+    ProfileView(uuid: UUID()).environment(UserStateViewModel())
 }
