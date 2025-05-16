@@ -54,8 +54,8 @@ struct ProfileView: View {
                     List(viewModel.posts, id: \.id) { post in
                         PostElementView(postData: post).listRowInsets(EdgeInsets())
                             .padding()
-
-                    }
+                    }.listStyle(.plain)
+                        .padding()
                 }
             }
         }
