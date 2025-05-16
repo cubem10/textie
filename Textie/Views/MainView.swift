@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(UserStateViewModel.self) var viewModel
+    @State private var timer: Timer?
     
     var body: some View {
         TabView {
@@ -24,6 +25,23 @@ struct MainView: View {
                 ProfileView(uuid: viewModel.uuid)
             }
             
+        }
+        .onAppear {
+            timer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { _ in
+                Task {
+                    do {
+                        let result = try await viewModel.refreshSession()
+                        if !result {
+                            print("Token automatic refresh failed.")
+                        }
+                    } catch {
+                        print("Token automatic refresh failed. \(error)")
+                    }
+                }
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
         }
     }
 }
