@@ -43,5 +43,5 @@ struct PostListView: View {
 }
 
 #Preview {
-    PostListView()
+    PostListView().environment(UserStateViewModel())
 }

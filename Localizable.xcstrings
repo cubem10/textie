@@ -2,7 +2,17 @@
   "sourceLanguage" : "en",
   "strings" : {
     "⋅" : {
-
+      "shouldTranslate" : false
+    },
+    "CANCEL" : {
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
+          }
+        }
+      }
     },
     "COMMENT_WRITE_PLACEHOLDER" : {
       "localizations" : {
@@ -37,12 +47,50 @@
         }
       }
     },
+    "DELETE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        }
+      }
+    },
     "EDIT_DONE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        }
+      }
+    },
+    "EDIT_POST" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Post"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 편집"
           }
         }
       }
@@ -52,13 +100,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit"
+            "value" : "Edit Profile"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "편집"
+            "value" : "프로필 편집"
           }
         }
       }
@@ -311,6 +359,16 @@
         }
       }
     },
+    "POST_MENU" : {
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 메뉴"
+          }
+        }
+      }
+    },
     "POST_TITLE" : {
       "localizations" : {
         "en" : {
@@ -487,6 +545,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Textie 회원 가입"
+          }
+        }
+      }
+    },
+    "REMOVE_POST" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Post"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 삭제"
+          }
+        }
+      }
+    },
+    "REMOVE_POST_CONFIRMATION_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do you want to remove the post? This action cannot be undone. "
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글을 삭제하시겠습니까? 삭제된 게시글은 복구될 수 없습니다. "
+          }
+        }
+      }
+    },
+    "REMOVE_POST_CONFIRMATION_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Post"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 삭제 확인"
           }
         }
       }

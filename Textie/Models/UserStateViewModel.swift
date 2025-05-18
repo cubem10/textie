@@ -17,7 +17,7 @@ class UserStateViewModel {
     init() {
         Task {
             do {
-                uuid = await getUUID() ?? UUID()
+                uuid = try await getUUID()
                 let refreshResult: Bool = try await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
@@ -161,7 +161,7 @@ class UserStateViewModel {
     }
     
     @MainActor
-    func getUUID() async -> UUID? {
+    func getUUID() async throws -> UUID {
         isLoading = true
         defer { isLoading = false }
         
@@ -176,7 +176,7 @@ class UserStateViewModel {
         }
         catch {
             print("An error occurred while fetching the user uuid: \(error)")
-            return nil
+            throw BackendError.invalidCredential
         }
             
         

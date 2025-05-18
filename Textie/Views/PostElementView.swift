@@ -13,6 +13,11 @@ struct PostElementView: View {
     @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
     @Environment(\.colorScheme) var colorScheme
+    @State private var showDialog: Bool = false
+    @State private var showDeleteAlert: Bool = false
+
+    @Environment(UserStateViewModel.self) var userStateViewModel
+    
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -32,32 +37,70 @@ struct PostElementView: View {
                 .padding(.bottom)
                 .lineLimit(nil)
             HStack {
-                Button(action: {
+                Group {
+                        if liked { Image(systemName: "heart.fill") }
+                        else { Image(systemName: "heart") }
+                }.onTapGesture {
                     liked.toggle()
-                }) {
-                    if liked { Image(systemName: "heart.fill") }
-                    else { Image(systemName: "heart") }
                 }
                 .foregroundStyle(colorScheme == .dark ? .white : .black)
                 .contentShape(Rectangle())
                 
                 Text(postData.likes.formatted(.number.notation(.compactName)))
                     .lineLimit(1)
-                Button(action: {
-                    showComment.toggle()
-                }) {
-                    Image(systemName: "bubble")
-                }.foregroundStyle(colorScheme == .dark ? .white : .black)
-                    .contentShape(Rectangle())
-                    .sheet(isPresented: $showComment) {
-                        CommentListView(postId: postData.id)
+                Image(systemName: "bubble")
+                    .onTapGesture {
+                        showComment.toggle()
                     }
+                if postData.userId == userStateViewModel.uuid {
+                    Image(systemName: "ellipsis")
+                        .onTapGesture {
+                            showDialog.toggle()
+                        }
+                }
             }
         }
+        .confirmationDialog("POST_MENU", isPresented: $showDialog) {
+                Button(action: {
+                    
+                }) {
+                    Text("EDIT_POST")
+                }
+                Button(action: {
+                    showDeleteAlert.toggle()
+                }) {
+                    Text("REMOVE_POST")
+                }
+                Button("CANCEL", role: .cancel) {
+                    
+                }
+        }
+            .alert(isPresented: $showDeleteAlert) {
+                Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
+                    Task {
+                        do {
+                            guard let token = userStateViewModel.getTokenFromKeychain(key: "access_token") else {
+                                return
+                            }
+                            let (response, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
+                            let _ = try await userStateViewModel.refreshSession()
+                            print("postData.id: \(postData.id)")
+                            print("response: \(String(data: response, encoding: .utf8) ?? "")")
+                            print(token)
+                        } catch {
+                            print("An error occurred while deleting post: \(error)")
+                        }
+                    }
+                },
+                      secondaryButton: .cancel())
+            }
+            .sheet(isPresented: $showComment) {
+                CommentListView(postId: postData.id)
+            }
         
     }
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", content: "Post content goes here. ", likes: 1234567890))
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
 }

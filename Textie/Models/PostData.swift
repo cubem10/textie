@@ -32,6 +32,7 @@ struct PostData: Identifiable, Decodable {
     let name: String
     let title: String
     let createdAt: String
+    let userId: UUID
     
     var content: String
     var likes: Int
@@ -56,6 +57,7 @@ extension PostData {
             name: nickname,
             title: post.title,
             createdAt: String.formatRelativeDate(post.createdAt),
+            userId: post.userId,
             content: post.content,
             likes: likes
         )

@@ -12,6 +12,7 @@ struct PostWriteView: View {
     @State var context: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         VStack {
             HStack {

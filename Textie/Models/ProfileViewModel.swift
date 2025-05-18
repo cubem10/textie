@@ -35,10 +35,13 @@ class ProfileViewModel {
         return postDataDTOs
     }
     
+    @MainActor
     func loadUser(token: String, uuid: UUID) async {
-        await MainActor.run {
-            isLoading = true
-        }
+        
+        isLoading = true
+        
+        defer { isLoading = false }
+        
         
         guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/user/\(uuid)", httpMethod: "GET", withToken: token) else {
             print("An error occurred while fetching user info. ")
@@ -46,7 +49,7 @@ class ProfileViewModel {
         }
         
         guard let decodedResponse: UserProfileDTO = try? JSONDecoder().decode(UserProfileDTO.self, from: response) else {
-            print("An error occurred while decoding user profile information.")
+            print("An error occurred while decoding user profile information with uuid: \(uuid).")
             print(String(data: response, encoding: .utf8) ?? "")
             return
         }
@@ -59,10 +62,6 @@ class ProfileViewModel {
         
         for post in postDTOs {
             await posts.append(PostData.construct(post: post, token: token))
-        }
-        
-        await MainActor.run {
-            isLoading = false
         }
     }
 }
