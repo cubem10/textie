@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct PostWriteView: View {
-    @State var title: String = ""
-    @State var context: String = ""
+    @State var title: String
+    @State var context: String
+
+    var postId: UUID?
+    
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
@@ -21,7 +25,14 @@ struct PostWriteView: View {
                     Task {
                         do {
                             let token = userStateViewModel.getTokenFromKeychain(key: "access_token") ?? ""
-                            let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: token)
+                            if let postId = postId {
+                                let (reponse, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: token)
+                                print("Edit response: \(String(data: reponse, encoding: .utf8) ?? "")")
+                                let _ = try await userStateViewModel.refreshSession()
+                                dismiss()
+                            } else {
+                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: token)
+                            }
                         } catch {
                             print("An error occurred while posting: \(error)")
                         }
@@ -58,5 +69,5 @@ struct PostWriteView: View {
 }
 
 #Preview {
-    PostWriteView().environment(UserStateViewModel())
+    PostWriteView(title: "", context: "").environment(UserStateViewModel())
 }

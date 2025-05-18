@@ -15,6 +15,7 @@ struct PostElementView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var showDialog: Bool = false
     @State private var showDeleteAlert: Bool = false
+    @State private var showEditView: Bool = false
 
     @Environment(UserStateViewModel.self) var userStateViewModel
     
@@ -62,7 +63,7 @@ struct PostElementView: View {
         }
         .confirmationDialog("POST_MENU", isPresented: $showDialog) {
                 Button(action: {
-                    
+                    showEditView.toggle()
                 }) {
                     Text("EDIT_POST")
                 }
@@ -96,6 +97,9 @@ struct PostElementView: View {
             }
             .sheet(isPresented: $showComment) {
                 CommentListView(postId: postData.id)
+            }
+            .sheet(isPresented: $showEditView) {
+                PostWriteView(title: postData.title, context: postData.content, postId: postData.id)
             }
         
     }

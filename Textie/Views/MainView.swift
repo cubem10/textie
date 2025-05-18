@@ -19,7 +19,7 @@ struct MainView: View {
             }
             
             Tab("POST_WRITE_TITLE", systemImage: "square.and.pencil", value: 1) {
-                PostWriteView()
+                PostWriteView(title: "", context: "")
             }
             
             Tab("PROFILE_TITLE", systemImage: "person.crop.circle.fill", value: 2) {
