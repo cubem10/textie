@@ -18,21 +18,32 @@ class ProfileViewModel {
     var nickname: String = ""
     var posts: [PostData] = []
     
-    func loadUserPosts(token: String, uuid: UUID) async -> [PostDataDTO] {
-        var postDataDTOs: [PostDataDTO] = []
-        
+    func loadUserPosts(token: String, uuid: UUID) async {
+        posts.removeAll()
+
         guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts", httpMethod: "GET", withToken: token) else {
             print("An error occurred while fetching posts.")
-            return postDataDTOs
+            return
         }
         
         guard let decodedResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: response) else {
             print("An error occurred while decoding posts.")
-            return postDataDTOs
+            return
         }
         
-        postDataDTOs = decodedResponse
-        return postDataDTOs
+        for postDataDTO in decodedResponse {
+            guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
+                print("An error occurred while fetching likes.")
+                return
+            }
+            
+            guard let decodedLikesResponse: LikeDataDTO = try? JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData) else {
+                print("An error occurred while decoding likes data.")
+                return
+            }
+            
+            await posts.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
+        }
     }
     
     @MainActor
@@ -54,14 +65,9 @@ class ProfileViewModel {
             return
         }
         
-        let postDTOs = await loadUserPosts(token: token, uuid: decodedResponse.id)
+        await loadUserPosts(token: token, uuid: decodedResponse.id)
         username = decodedResponse.username
         nickname = decodedResponse.nickname
         
-        posts.removeAll()
-        
-        for post in postDTOs {
-            await posts.append(PostData.construct(post: post, token: token))
-        }
     }
 }

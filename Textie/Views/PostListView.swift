@@ -29,7 +29,9 @@ struct PostListView: View {
                     
                     let posts = viewModel.postDatas
                     List(posts) { postData in
-                        PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                        if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
+                            PostElementView(postData: postData, token: token).padding().listRowInsets(EdgeInsets())
+                        }
                     }.listStyle(.plain)
                 }
                 Spacer()

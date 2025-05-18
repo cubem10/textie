@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PostElementView: View {
     var postData: PostData
+    var token: String
     @State private var showComment: Bool = false
     @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
@@ -39,10 +40,17 @@ struct PostElementView: View {
                 .lineLimit(nil)
             HStack {
                 Group {
-                        if liked { Image(systemName: "heart.fill") }
-                        else { Image(systemName: "heart") }
+                    if liked { Image(systemName: "heart.fill") }
+                    else { Image(systemName: "heart") }
                 }.onTapGesture {
-                    liked.toggle()
+                    Task {
+                        do {
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: token)
+                            liked.toggle()
+                        } catch {
+                            print("An error occurred while liking post: \(error)")
+                        }
+                    }
                 }
                 .foregroundStyle(colorScheme == .dark ? .white : .black)
                 .contentShape(Rectangle())
@@ -80,14 +88,8 @@ struct PostElementView: View {
                 Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
                     Task {
                         do {
-                            guard let token = userStateViewModel.getTokenFromKeychain(key: "access_token") else {
-                                return
-                            }
-                            let (response, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
                             let _ = try await userStateViewModel.refreshSession()
-                            print("postData.id: \(postData.id)")
-                            print("response: \(String(data: response, encoding: .utf8) ?? "")")
-                            print(token)
                         } catch {
                             print("An error occurred while deleting post: \(error)")
                         }
@@ -106,5 +108,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890), token: "")
 }
