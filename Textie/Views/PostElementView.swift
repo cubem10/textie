@@ -27,7 +27,7 @@ struct PostElementView: View {
                 Text(postData.name)
                     .lineLimit(1)
                 Text("⋅")
-                Text(postData.createdAt)
+                Text(postData.createdAt + (postData.isEdited ? " " + String(localized: "EDITED_TEXT") : ""))
                     .font(.subheadline)
             }.frame(height: 30)
                 .padding(.vertical, 5)
@@ -106,5 +106,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
 }
