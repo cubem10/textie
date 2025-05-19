@@ -53,6 +53,38 @@
         }
       }
     },
+    "CONTAINS_NUMBERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Containing Numbers"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "숫자 포함"
+          }
+        }
+      }
+    },
+    "CONTAINS_SPECIAL_CHARACTERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Containing Special Characters"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "특수 문자 포함"
+          }
+        }
+      }
+    },
     "DELETE" : {
       "localizations" : {
         "en" : {
@@ -263,6 +295,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "로그아웃"
+          }
+        }
+      }
+    },
+    "MATCHES_PASSWORD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching Passwords"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비밀번호 일치"
+          }
+        }
+      }
+    },
+    "MORE_THAN_EIGHT_CHARACTERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Containing At Least 8 Characters"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8글자 이상 포함"
           }
         }
       }
