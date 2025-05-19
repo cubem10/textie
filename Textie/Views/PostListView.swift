@@ -44,6 +44,11 @@ struct PostListView: View {
         .task {
             await viewModel.loadInitialPost(token: userStateViewModel.token)
         }
+        .refreshable {
+            Task {
+                await viewModel.loadInitialPost(token: userStateViewModel.token)
+            }
+        }
     }
 }
 

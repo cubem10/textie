@@ -38,10 +38,7 @@ struct LoginView: View {
                     }
                 }) {
                     Text("SIGNIN_BUTTON")
-                }.disabled(username == "" || password.count < 8)
-                    .alert(isPresented: $invaildCredentials) {
-                        Alert(title: Text("INVALID_CREDENTIAL"), message: Text("INVAILD_CREDENTIAL_DETAILS"))
-                    }.padding()
+                }.padding().disabled(username == "" || password.count < 8)
                 Button(action: { showRegisterView.toggle() }) {
                     Text("REGISTER_BUTTON")
                 }.sheet(isPresented: $showRegisterView) {
@@ -58,6 +55,9 @@ struct LoginView: View {
                 }
                 .alert(isPresented: $loginFailed) {
                     Alert(title: Text("LOGIN_FAIL"), message: Text("LOGIN_FAIL_DETAIL"))
+                }
+                .alert(isPresented: $invaildCredentials) {
+                    Alert(title: Text("INVALID_CREDENTIAL"), message: Text("INVAILD_CREDENTIAL_DETAILS"))
                 }
             }
         }.padding()

@@ -127,18 +127,16 @@ class UserStateViewModel {
         let accessTokenQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                     kSecAttrService as String: "Textie",
                                     kSecAttrAccount as String: "access_token",
-                                    kSecMatchLimit as String: kSecMatchLimitOne,
                                     kSecReturnData as String: kCFBooleanTrue!]
         
-        let accessTokenStatus = SecItemCopyMatching(accessTokenQuery as CFDictionary, nil)
+        let accessTokenStatus = SecItemDelete(accessTokenQuery as CFDictionary)
         
         let refreshTokenQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                     kSecAttrService as String: "Textie",
                                     kSecAttrAccount as String: "refresh_token",
-                                    kSecMatchLimit as String: kSecMatchLimitOne,
                                     kSecReturnData as String: kCFBooleanTrue!]
         
-        let refreshTokenStatus = SecItemCopyMatching(refreshTokenQuery as CFDictionary, nil)
+        let refreshTokenStatus = SecItemDelete(refreshTokenQuery as CFDictionary)
         
         isLoggedIn = false
         
