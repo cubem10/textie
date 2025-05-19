@@ -32,6 +32,7 @@ struct ProfileView: View {
                             HStack {
                                 Text(viewModel.nickname)
                                     .font(.title)
+                                    .fontWeight(.bold)
                             }
                             Button(action: {
                                 UIPasteboard.general.string = "@" + viewModel.username
@@ -42,33 +43,31 @@ struct ProfileView: View {
                                     Image(systemName: "document.on.document.fill").scaleEffect(0.7)
                                 }
                             }.foregroundStyle(colorScheme == .dark ? .white : .black)
-                        }
-                        Spacer()
-                        if isMyProfile {
-                            VStack {
-                                Button(action: {
-                                    Task {
-                                        let logoutStatus: Bool = await userStateViewModel.logout()
-                                        logger.debug("logoutStatus: \(logoutStatus)")
+                            if isMyProfile {
+                                HStack {
+                                    Button(action: {
+                                        editingProfile.toggle()
+                                    }) {
+                                        Text("EDIT_PROFILE")
+                                    }.padding(.trailing)
+                                    Button(action: {
+                                        Task {
+                                            let logoutStatus: Bool = await userStateViewModel.logout()
+                                            logger.debug("logoutStatus: \(logoutStatus)")
+                                        }
+                                    }) {
+                                        Text("LOGOUT")
                                     }
-                                }) {
-                                    Text("LOGOUT")
-                                }
-                                .padding()
-                                Button(action: {
-                                    editingProfile.toggle()
-                                }) {
-                                    Text("EDIT_PROFILE")
                                 }
                             }
                         }
                     }
-                    .frame(height: 75)
-                    .padding()
+                    .frame(height: 100)
+                    .padding(.bottom)
+                    Divider()
                     List(viewModel.posts, id: \.id) { post in
                         PostElementView(postData: post).padding().listRowInsets(EdgeInsets())
                     }.listStyle(.plain)
-                        .padding()
                 }
             }
         }
@@ -78,6 +77,7 @@ struct ProfileView: View {
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)
         }
+        .padding()
     }
 }
 
