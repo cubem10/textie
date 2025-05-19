@@ -36,6 +36,7 @@ struct PostListView: View {
                                 await viewModel.loadMorePost(id: postData.id)
                             }
                     }.listStyle(.plain)
+                    .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                 }
                 Spacer()
             }

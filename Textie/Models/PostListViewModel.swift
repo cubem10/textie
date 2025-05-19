@@ -61,6 +61,7 @@ class PostListViewModel {
 
         isLoading = true
         defer { isLoading = false }
+        offset = 0
         
         do {
             try await loadPost(token: token)
