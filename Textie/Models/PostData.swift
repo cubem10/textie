@@ -49,7 +49,7 @@ extension PostData {
             let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
             nickname = decodedResponse.nickname
         } catch {
-            print("An error occurred while fetching user profile. Error: \(error)")
+            // TODO: error handling
         }
         
         
@@ -123,7 +123,7 @@ extension CommentData {
             let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
             nickname = decodedResponse.nickname
         } catch {
-            print("An error occurred while fetching user profile. Error: \(error)")
+            // TODO: error handling
         }
         
         return CommentData(

@@ -24,17 +24,15 @@ struct PostWriteView: View {
                 Button(action: {
                     Task {
                         do {
-                            let token = userStateViewModel.getTokenFromKeychain(key: "access_token") ?? ""
                             if let postId = postId {
-                                let (reponse, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: token)
-                                print("Edit response: \(String(data: reponse, encoding: .utf8) ?? "")")
+                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: userStateViewModel.token)
                                 let _ = try await userStateViewModel.refreshSession()
                                 dismiss()
                             } else {
-                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: token)
+                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: userStateViewModel.token)
                             }
                         } catch {
-                            print("An error occurred while posting: \(error)")
+                            // TODO: error handling
                         }
                     }
                 }) {

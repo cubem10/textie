@@ -22,23 +22,19 @@ class ProfileViewModel {
         posts.removeAll()
 
         guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts", httpMethod: "GET", withToken: token) else {
-            print("An error occurred while fetching posts.")
             return
         }
         
         guard let decodedResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: response) else {
-            print("An error occurred while decoding posts.")
             return
         }
         
         for postDataDTO in decodedResponse {
             guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
-                print("An error occurred while fetching likes.")
                 return
             }
             
             guard let decodedLikesResponse: LikeDataDTO = try? JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData) else {
-                print("An error occurred while decoding likes data.")
                 return
             }
             
@@ -50,18 +46,14 @@ class ProfileViewModel {
     func loadUser(token: String, uuid: UUID) async {
         
         isLoading = true
-        
         defer { isLoading = false }
         
         
         guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/user/\(uuid)", httpMethod: "GET", withToken: token) else {
-            print("An error occurred while fetching user info. ")
             return
         }
         
         guard let decodedResponse: UserProfileDTO = try? JSONDecoder().decode(UserProfileDTO.self, from: response) else {
-            print("An error occurred while decoding user profile information with uuid: \(uuid).")
-            print(String(data: response, encoding: .utf8) ?? "")
             return
         }
         

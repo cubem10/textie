@@ -68,5 +68,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    LoginView().environment(UserStateViewModel())
 }

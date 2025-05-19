@@ -44,12 +44,10 @@ struct PostElementView: View {
                 }.onTapGesture {
                     Task {
                         do {
-                            if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
-                                let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: token)
-                            }
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: userStateViewModel.token)
                             liked.toggle()
                         } catch {
-                            print("An error occurred while liking post: \(error)")
+                            // TODO: error handling
                         }
                     }
                 }
@@ -89,12 +87,10 @@ struct PostElementView: View {
                 Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
                     Task {
                         do {
-                            if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
-                                let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
-                            }
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
                             let _ = try await userStateViewModel.refreshSession()
                         } catch {
-                            print("An error occurred while deleting post: \(error)")
+                            // TODO: error handling
                         }
                     }
                 },

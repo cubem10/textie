@@ -31,19 +31,17 @@ struct PostListView: View {
                     }
                     
                     let posts = viewModel.postDatas
-                    if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
-                        List(posts) { postData in
-                            PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
-                        }.listStyle(.plain)
-                        .task {
-                            await viewModel.loadPost(token: token, offset: offset, limit: limit)
-                        }
-                    }
+                    List(posts) { postData in
+                        PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                    }.listStyle(.plain)
                 }
                 Spacer()
             }
         }
         .padding()
+        .task {
+            await viewModel.loadPost(token: userStateViewModel.token, offset: offset, limit: limit)
+        }
     }
 }
 

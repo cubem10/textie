@@ -34,9 +34,11 @@ struct MainView: View {
                         let result = try await viewModel.refreshSession()
                         if !result {
                             print("Token automatic refresh failed.")
+                            // TODO: error handling
                         }
                     } catch {
                         print("Token automatic refresh failed. \(error)")
+                        // TODO: error handling
                     }
                 }
             }

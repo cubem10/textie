@@ -17,22 +17,15 @@ class PostListViewModel: ObservableObject {
     }
     
     func loadPost(token: String, offset: Int, limit: Int) async {
-        print("loadPost called")
-        
         await MainActor.run {
             isLoading = true
         }
         
-        print("fetchPost started")
-        
         guard let (postResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") else {
-            print("An error occurred while fetching posts.")
             return
         }
         
         guard let decodedPostResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: postResponseData) else {
-            print("An error occurred while decoding posts data.")
-            print(String(data: postResponseData, encoding: .utf8) ?? "")
             return
         }
         
@@ -40,12 +33,10 @@ class PostListViewModel: ObservableObject {
         
         for postDataDTO in decodedPostResponse {
             guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
-                print("An error occurred while fetching likes.")
                 return
             }
             
             guard let decodedLikesResponse: LikeDataDTO = try? JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData) else {
-                print("An error occurred while decoding likes data.")
                 return
             }
             

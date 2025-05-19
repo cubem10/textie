@@ -47,7 +47,6 @@ struct ProfileView: View {
                                 Button(action: {
                                     Task {
                                         let logoutStatus: Bool = await userStateViewModel.logout()
-                                        print("logoutStatus: \(logoutStatus)")
                                     }
                                 }) {
                                     Text("LOGOUT")
@@ -71,7 +70,7 @@ struct ProfileView: View {
             }
         }
         .task {
-            await viewModel.loadUser(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "", uuid: uuid)
+            await viewModel.loadUser(token: userStateViewModel.token, uuid: uuid)
         }
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)

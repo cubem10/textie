@@ -13,18 +13,22 @@ class UserStateViewModel {
     var isLoading: Bool = false
     
     var uuid: UUID = UUID()
+    var token: String = ""
     
     init() {
         Task {
             do {
                 uuid = try await getUUID()
+                guard let accessToken = getTokenFromKeychain(key: "access_token") else {
+                    throw BackendError.invalidCredential
+                }
+                token = accessToken
                 let refreshResult: Bool = try await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
-                    print("Session refreshed, user is logged in. isLoggined: \(isLoggedIn)")
                 }
             } catch {
-                print("An error occurred while refreshing session: \(error)")
+                // TODO: error handling
             }
         }
     }
@@ -41,7 +45,7 @@ class UserStateViewModel {
         return status == errSecSuccess
     }
 
-    func getTokenFromKeychain(key: String) -> String? {
+    private func getTokenFromKeychain(key: String) -> String? {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                     kSecAttrService as String: "Textie",
                                     kSecAttrAccount as String: key,
@@ -58,27 +62,20 @@ class UserStateViewModel {
         return nil
     }
 
-    private func parseTokenResponse(encodedResponse data: Data) {
-        print(String(data: data, encoding: .utf8) ?? "")
-        
+    private func parseTokenResponse(encodedResponse data: Data) -> Bool {
         var accessToken: String = ""
         var refreshToken: String = ""
         do {
             let decodedResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
             accessToken = decodedResponse.access_token
             refreshToken = decodedResponse.refresh_token
-            print("Token successfully obtained")
             
             let isAccessTokenSaved = saveTokenToKeychain(token: accessToken, key: "access_token")
             let isRefreshTokenSaved = saveTokenToKeychain(token: refreshToken, key: "refresh_token")
             
-            if isAccessTokenSaved && isRefreshTokenSaved {
-                print("Token saved successfully")
-            } else {
-                print("Failed to save tokens")
-            }
+            return isAccessTokenSaved && isRefreshTokenSaved
         } catch {
-            print("Failed to decode JSON: \(error)")
+            return false
         }
     }
 
@@ -87,12 +84,7 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        do {
-            parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
-            isLoggedIn = true
-        } catch {
-            print("Failed to send login request to server: \(error)")
-        }
+        isLoggedIn = parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
     }
 
     @MainActor
@@ -104,13 +96,10 @@ class UserStateViewModel {
             let response: (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
             
             if let response = response.1 as? HTTPURLResponse, response.statusCode == 500 {
-                print("User already exists with this username, response code \(response.statusCode)")
                 throw BackendError.existingUserRegistration
             }
             
-            parseTokenResponse(encodedResponse: response.0)
-            
-            isLoggedIn = true
+            isLoggedIn = parseTokenResponse(encodedResponse: response.0)
         } catch {
             onError(error)
         }
@@ -122,17 +111,10 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        do {
-            guard let refreshToken: String = getTokenFromKeychain(key: "refresh_token") else {
-                print("Invaild refresh token")
-                return false
-            }
-            parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0)
-            return true
-        } catch {
-            print("An error occurred while refreshing session token. \(error)")
+        guard let refreshToken: String = getTokenFromKeychain(key: "refresh_token") else {
             return false
         }
+        return parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0)
     }
     
     func logout() async -> Bool {
@@ -165,7 +147,6 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        print("getUUID started")
         guard let accessToken = getTokenFromKeychain(key: "access_token") else {
             throw BackendError.invalidCredential
         }
@@ -173,11 +154,9 @@ class UserStateViewModel {
         do {
             let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user", httpMethod: "GET", withToken: accessToken)
             let decodedResponse = try JSONDecoder().decode(UserProfileDTO.self, from: response)
-            print(decodedResponse.id)
             return decodedResponse.id
         }
         catch {
-            print("An error occurred while fetching the user uuid: \(error)")
             throw BackendError.invalidCredential
         }
             

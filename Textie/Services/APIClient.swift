@@ -17,12 +17,6 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     request.addValue("application/json", forHTTPHeaderField: "Accept")
     request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
-    do {
-        let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
-        return (responseData, response)
-    } catch {
-        print("An error occurred while processing the request: \(error)")
-    }
-    
-    return (Data(), URLResponse())
+    let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
+    return (responseData, response)
 }

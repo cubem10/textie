@@ -20,11 +20,10 @@ struct ProfileEditView: View {
                     Task {
                         defer { dismiss() }
                         do {
-                            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.getTokenFromKeychain(key: "access_token") ?? "")
+                            let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.token)
                             let _ = try await viewModel.refreshSession()
-                            print("/user PATCH response: \(String(data: response, encoding: .utf8) ?? "")")
                         } catch {
-                            print("An error occurred while changing the nickname: \(error)")
+                            // TODO: error handling
                         }
                     }
                 }) {

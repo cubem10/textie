@@ -13,7 +13,6 @@ struct CommentListView: View {
     @State var newComment: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
     var body: some View {
-        let token: String = userStateViewModel.getTokenFromKeychain(key: "access_token") ?? ""
         VStack {
             Text("COMMENTS")
                 .font(.title)
@@ -38,8 +37,8 @@ struct CommentListView: View {
                     TextField("COMMENT_WRITE_PLACEHOLDER", text: $newComment)
                     Button(action: {
                         Task {
-                            await viewModel.addComment(postId: postId, token: token, content: newComment)
-                            await viewModel.loadComments(postId: postId, token: token)
+                            await viewModel.addComment(postId: postId, token: userStateViewModel.token, content: newComment)
+                            await viewModel.loadComments(postId: postId, token: userStateViewModel.token)
                         }
                     }) {
                         Image(systemName: "paperplane.fill")
@@ -48,7 +47,7 @@ struct CommentListView: View {
             }
         }.padding()
         .task {
-            await viewModel.loadComments(postId: postId, token: token)
+            await viewModel.loadComments(postId: postId, token: userStateViewModel.token)
         }
     }
 }
