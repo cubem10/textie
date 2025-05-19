@@ -18,17 +18,21 @@ struct PostWriteView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        VStack {
+        let isEditing: Bool = postId != nil
+        VStack(alignment: .leading) {
+            Text(isEditing ? "EDIT_POST" : "POST_WRITE_TITLE")
+                .font(.title)
+                .fontWeight(.bold)
             HStack {
-                if postId != nil {
+                if isEditing {
                     Button(action: { dismiss() }) { Text("CLOSE") }
                 }
                 Spacer()
                 Button(action: {
                     Task {
                         do {
-                            if let postId = postId {
-                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: userStateViewModel.token)
+                            if isEditing {
+                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId!)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: userStateViewModel.token)
                                 let _ = try await userStateViewModel.refreshSession()
                                 dismiss()
                             } else {
