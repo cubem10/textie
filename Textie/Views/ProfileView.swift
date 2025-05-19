@@ -64,9 +64,7 @@ struct ProfileView: View {
                     .frame(height: 75)
                     .padding()
                     List(viewModel.posts, id: \.id) { post in
-                        if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
-                            PostElementView(postData: post, token: token).padding().listRowInsets(EdgeInsets())
-                        }
+                        PostElementView(postData: post).padding().listRowInsets(EdgeInsets())
                     }.listStyle(.plain)
                         .padding()
                 }

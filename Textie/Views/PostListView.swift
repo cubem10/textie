@@ -11,6 +11,9 @@ struct PostListView: View {
     @StateObject private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
     @Environment(UserStateViewModel.self) var userStateViewModel
     
+    private var offset: Int = 0
+    private let limit: Int = 10
+    
     var body: some View {
         VStack(alignment: .leading) {
             Group {
@@ -28,19 +31,19 @@ struct PostListView: View {
                     }
                     
                     let posts = viewModel.postDatas
-                    List(posts) { postData in
-                        if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
-                            PostElementView(postData: postData, token: token).padding().listRowInsets(EdgeInsets())
+                    if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
+                        List(posts) { postData in
+                            PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                        }.listStyle(.plain)
+                        .task {
+                            await viewModel.loadPost(token: token, offset: offset, limit: limit)
                         }
-                    }.listStyle(.plain)
+                    }
                 }
                 Spacer()
             }
         }
         .padding()
-        .task {
-            await viewModel.loadPost(token: userStateViewModel.getTokenFromKeychain(key: "access_token") ?? "")
-        }
     }
 }
 

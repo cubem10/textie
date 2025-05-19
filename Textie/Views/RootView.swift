@@ -25,5 +25,5 @@ struct RootView: View {
 }
 
 #Preview {
-    RootView()
+    RootView().environment(UserStateViewModel())
 }

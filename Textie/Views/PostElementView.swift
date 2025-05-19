@@ -9,7 +9,6 @@ import SwiftUI
 
 struct PostElementView: View {
     var postData: PostData
-    var token: String
     @State private var showComment: Bool = false
     @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
@@ -45,7 +44,9 @@ struct PostElementView: View {
                 }.onTapGesture {
                     Task {
                         do {
-                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: token)
+                            if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
+                                let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: token)
+                            }
                             liked.toggle()
                         } catch {
                             print("An error occurred while liking post: \(error)")
@@ -88,7 +89,9 @@ struct PostElementView: View {
                 Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
                     Task {
                         do {
-                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
+                            if let token = userStateViewModel.getTokenFromKeychain(key: "access_token") {
+                                let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: token)
+                            }
                             let _ = try await userStateViewModel.refreshSession()
                         } catch {
                             print("An error occurred while deleting post: \(error)")
@@ -108,5 +111,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890), token: "")
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890))
 }

@@ -166,7 +166,9 @@ class UserStateViewModel {
         defer { isLoading = false }
         
         print("getUUID started")
-        let accessToken = getTokenFromKeychain(key: "access_token") ?? ""
+        guard let accessToken = getTokenFromKeychain(key: "access_token") else {
+            throw BackendError.invalidCredential
+        }
         
         do {
             let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user", httpMethod: "GET", withToken: accessToken)
