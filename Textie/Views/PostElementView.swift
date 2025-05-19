@@ -12,18 +12,21 @@ struct PostElementView: View {
     @State private var showComment: Bool = false
     @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
-    @Environment(\.colorScheme) var colorScheme
     @State private var showDialog: Bool = false
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
-
-    @Environment(UserStateViewModel.self) var userStateViewModel
+    @State private var showProfileView: Bool = false
     
+    @Environment(UserStateViewModel.self) var userStateViewModel
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 ProfileImageView().frame(width: 30, height: 30)
+                    .onTapGesture {
+                        showProfileView.toggle()
+                    }
                 Text(postData.name)
                     .lineLimit(1)
                 Text("⋅")
@@ -97,15 +100,32 @@ struct PostElementView: View {
                       secondaryButton: .cancel())
             }
             .sheet(isPresented: $showComment) {
-                CommentListView(postId: postData.id)
+                VStack(alignment: .trailing) {
+                    Button(action: {
+                        showComment.toggle()
+                    }) {
+                        Text("CLOSE")
+                    }
+                    CommentListView(postId: postData.id)
+                }.padding()
             }
             .sheet(isPresented: $showEditView) {
                 PostWriteView(title: postData.title, context: postData.content, postId: postData.id)
+            }
+            .sheet(isPresented: $showProfileView) {
+                VStack(alignment: .trailing) {
+                    Button(action: {
+                        showProfileView.toggle()
+                    }) {
+                        Text("CLOSE")
+                    }
+                    ProfileView(uuid: postData.userId)
+                }.padding()
             }
         
     }
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890))
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: "1시간 전", userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
 }

@@ -20,6 +20,9 @@ struct PostWriteView: View {
     var body: some View {
         VStack {
             HStack {
+                if postId != nil {
+                    Button(action: { dismiss() }) { Text("CLOSE") }
+                }
                 Spacer()
                 Button(action: {
                     Task {
