@@ -19,6 +19,8 @@ struct PostWriteView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
+    @Binding var selectedTab: Int
+    
     var logger = Logger()
     
     var body: some View {
@@ -43,6 +45,7 @@ struct PostWriteView: View {
                                 dismiss()
                             } else {
                                 let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: userStateViewModel.token)
+                                selectedTab = 0
                             }
                         } catch {
                             if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
@@ -90,5 +93,5 @@ struct PostWriteView: View {
 }
 
 #Preview {
-    PostWriteView(title: "", context: "").environment(UserStateViewModel())
+    PostWriteView(title: "", context: "", selectedTab: .constant(1)).environment(UserStateViewModel())
 }

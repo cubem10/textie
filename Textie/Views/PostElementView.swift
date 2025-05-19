@@ -120,7 +120,7 @@ struct PostElementView: View {
                 }.padding()
             }
             .sheet(isPresented: $showEditView) {
-                PostWriteView(title: postData.title, context: postData.content, postId: postData.id)
+                PostWriteView(title: postData.title, context: postData.content, postId: postData.id, selectedTab: .constant(1))
             }
             .sheet(isPresented: $showProfileView) {
                 VStack(alignment: .trailing) {

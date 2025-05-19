@@ -22,7 +22,7 @@ struct MainView: View {
             }
             
             Tab("POST_WRITE_TITLE", systemImage: "square.and.pencil", value: 1) {
-                PostWriteView(title: "", context: "")
+                PostWriteView(title: "", context: "", selectedTab: $selection)
             }
             
             Tab("PROFILE_TITLE", systemImage: "person.crop.circle.fill", value: 2) {
