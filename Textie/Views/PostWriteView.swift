@@ -27,6 +27,8 @@ struct PostWriteView: View {
             Text(isEditing ? "EDIT_POST" : "POST_WRITE_TITLE")
                 .font(.title)
                 .fontWeight(.bold)
+                .padding(.bottom)
+                .listRowInsets(EdgeInsets())
             HStack {
                 if isEditing {
                     Button(action: { dismiss() }) { Text("CLOSE") }
@@ -52,29 +54,31 @@ struct PostWriteView: View {
                 }) {
                     Text("POST_WRITE_SUBMIT")
                 }
-            }
-            ZStack {
-                TextField(String(""), text: $title)
-                    .padding(EdgeInsets())
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 4).stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
-                    }
+            }.padding(.bottom)
+            .listRowInsets(EdgeInsets())
+            ZStack(alignment: .topLeading) {
+                TextField(String(""), text: $title).padding(EdgeInsets()).fontWeight(.bold)
                 if title.isEmpty {
-                    Text("POST_WRITE_TITLE_PLACEHOLDER").foregroundStyle(Color.gray)
+                    Text("POST_WRITE_TITLE_PLACEHOLDER").foregroundStyle(Color.gray).fontWeight(.bold)
                 }
             }
-        Spacer()
-        ZStack {
-            TextEditor(text: $context).padding(EdgeInsets())
-
-            if context.isEmpty {
-                Text("POST_WRITE_PLACEHOLDER")
-                    .foregroundColor(Color.gray)
+            Divider()
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $context).contentMargins(.horizontal, -4)
+                if context.isEmpty {
+                    Text("POST_WRITE_PLACEHOLDER")
+                        .foregroundColor(Color.gray)
+                        .padding(.top, 8)
+                }
             }
-        }
-        .overlay {
-                RoundedRectangle(cornerRadius: 8).stroke(colorScheme == .dark ? Color.white : Color.black, lineWidth: 1)
-        }
+            Divider()
+            HStack {
+                Spacer()
+                ZStack(alignment: .topTrailing) {
+                    Text(context.count.description)
+                        .font(.subheadline)
+                }
+            }
         Spacer()
         }.padding()
             .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
