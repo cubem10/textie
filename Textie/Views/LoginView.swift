@@ -33,7 +33,13 @@ struct LoginView: View {
                         do {
                             try await userStateViewModel.login(username: username, password: password)
                         } catch {
-                            loginFailed = true
+                            if let error = error as? BackendError, case .invalidCredential = error {
+                                invaildCredentials = true
+                            }
+                            else {
+                                loginFailed = true
+                            }
+                            print("invalidCredentials: \(invaildCredentials)")
                         }
                     }
                 }) {
@@ -60,10 +66,10 @@ struct LoginView: View {
                     Alert(title: Text("INVALID_CREDENTIAL"), message: Text("INVAILD_CREDENTIAL_DETAILS"))
                 }
             }
-        }.padding()
-            .onAppear() {
-                
+            if userStateViewModel.isLoading {
+                ProgressView("LOGIN_LOADING_MESSAGE")
             }
+        }.padding()
     }
 }
 

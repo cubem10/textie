@@ -11,6 +11,7 @@ import Foundation
 class UserStateViewModel {
     var isLoggedIn: Bool = false
     var isLoading: Bool = false
+    var isRetrievingUUID: Bool = false
     
     var uuid: UUID = UUID()
     var token: String = ""
@@ -84,7 +85,11 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        isLoggedIn = parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST").0)
+        let (data, response): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST")
+        if let response = response as? HTTPURLResponse, response.statusCode == 400 { // Bad Request: Invalid credentials
+            throw BackendError.invalidCredential
+        }
+        isLoggedIn = parseTokenResponse(encodedResponse: data)
     }
 
     @MainActor
@@ -145,8 +150,8 @@ class UserStateViewModel {
     
     @MainActor
     func getUUID() async throws -> UUID {
-        isLoading = true
-        defer { isLoading = false }
+        isRetrievingUUID = true
+        defer { isRetrievingUUID = false }
         
         guard let accessToken = getTokenFromKeychain(key: "access_token") else {
             throw BackendError.invalidCredential

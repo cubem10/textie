@@ -12,7 +12,7 @@ struct RootView: View {
     
     var body: some View {
         Group {
-            if userStateViewModel.isLoading {
+            if userStateViewModel.isRetrievingUUID {
                 ProgressView("LOGIN_LOADING_MESSAGE")
             }
             else if userStateViewModel.isLoggedIn {
