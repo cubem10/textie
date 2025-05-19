@@ -39,7 +39,6 @@ struct LoginView: View {
                             else {
                                 loginFailed = true
                             }
-                            print("invalidCredentials: \(invaildCredentials)")
                         }
                     }
                 }) {

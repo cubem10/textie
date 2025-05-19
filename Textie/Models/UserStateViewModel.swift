@@ -29,7 +29,7 @@ class UserStateViewModel {
                     isLoggedIn = true
                 }
             } catch {
-                // TODO: error handling
+                print("An error occurred while initializing the app: \(error), access token found: \(token != "")")
             }
         }
     }
@@ -73,6 +73,12 @@ class UserStateViewModel {
             
             let isAccessTokenSaved = saveTokenToKeychain(token: accessToken, key: "access_token")
             let isRefreshTokenSaved = saveTokenToKeychain(token: refreshToken, key: "refresh_token")
+            
+            token = accessToken
+            
+            Task {
+                uuid = try await getUUID()
+            }
             
             return isAccessTokenSaved && isRefreshTokenSaved
         } catch {

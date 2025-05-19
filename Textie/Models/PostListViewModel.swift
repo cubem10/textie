@@ -22,7 +22,6 @@ class PostListViewModel {
     
     func loadMorePost(id: UUID) async {
         if id == postDatas.last?.id {
-            print("Loading more...")
             do {
                 try await loadPost(token: token)
                 offset += limit
