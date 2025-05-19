@@ -12,9 +12,10 @@ struct CommentListView: View {
     var postId: UUID
     var logger = Logger()
     
-    @StateObject var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
+    @State var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
     @State var newComment: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
+    @Environment(\.colorScheme) var colorScheme
     @State var showErrorAlert: Bool = false
     var body: some View {
         VStack {
@@ -32,13 +33,29 @@ struct CommentListView: View {
                 else {
                     List(viewModel.comments) { commentData in
                         CommentElementView(commentData: commentData)
-                            .listRowInsets(EdgeInsets())
+                        .listRowInsets(EdgeInsets())
+                        .padding(.vertical)
+                        .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                        .task {
+                            await viewModel.loadMoreComments(id: commentData.id)
+                        }
                     }
                     .listStyle(.plain)
                 }
                 Spacer()
                 HStack {
-                    TextField("COMMENT_WRITE_PLACEHOLDER", text: $newComment)
+                    TextField("", text: $newComment)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(.white)
+                        .background {
+                        if newComment.count == 0 {
+                            HStack {
+                                Text("COMMENT_WRITE_PLACEHOLDER")
+                                    .padding(.horizontal, 8)
+                                Spacer()
+                            }
+                        }
+                    }
                     Button(action: {
                         Task {
                             do {
@@ -49,16 +66,19 @@ struct CommentListView: View {
                                     showErrorAlert = true
                                 }
                             }
-                            await viewModel.loadComments(postId: postId, token: userStateViewModel.token)
+                            await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
                         }
                     }) {
-                        Image(systemName: "paperplane.fill")
+                        Image(systemName: "paperplane.fill").padding(.horizontal, 8)
                     }
                 }
+                .overlay {
+                    Capsule().fill(.clear).strokeBorder(colorScheme == .dark ? Color.white : Color.gray.opacity(0.7), lineWidth: 1)
+                }
             }
-        }.padding()
+        }
         .task {
-            await viewModel.loadComments(postId: postId, token: userStateViewModel.token)
+            await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
             Button("CONFIRM") { }
@@ -69,5 +89,5 @@ struct CommentListView: View {
 }
 
 #Preview {
-    CommentListView(postId: UUID()).environment(UserStateViewModel())
+    CommentListView(postId: UUID(uuidString: "a2e667da-deab-4e45-844b-61fd4cc5f6a1")!).environment(UserStateViewModel())
 }

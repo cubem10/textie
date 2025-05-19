@@ -20,8 +20,7 @@ struct CommentElementView: View {
                 Text(commentData.content)
                     .font(.body)
             }
-            Spacer()
-        }.padding()
+        }
     }
 }
 

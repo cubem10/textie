@@ -6,12 +6,20 @@
 //
 
 import Foundation
+import os
 
-class CommentListViewModel: ObservableObject {
-    @Published var isLoading: Bool = false
+@Observable
+class CommentListViewModel {
+    var isLoading: Bool = false
+    var isMoreLoading: Bool = false
     
     private var offset: Int = 0
     private var limit: Int = 10
+    
+    private var postId: UUID = UUID()
+    private var token: String = ""
+    
+    private var logger = Logger()
     
     var comments: [CommentData] = []
     
@@ -20,27 +28,53 @@ class CommentListViewModel: ObservableObject {
         self.limit = limit
     }
     
-    func loadComments(postId: UUID, token: String) async {
-        await MainActor.run {
-            isLoading = true
-        }
-        
-        guard let (response, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET") else {
-            return
-        }
-        
-        guard let decodedComments: CommentResponseDTO = try? JSONDecoder().decode(CommentResponseDTO.self, from: response) else {
-            return
-        }
+    @MainActor
+    func loadInitialComments(postId: UUID, token: String) async {
+        self.postId = postId
+        self.token = token
         
         comments.removeAll()
+        offset = 0
         
-        for comment in decodedComments.comments {
-            await comments.append(CommentData.construct(comment: comment, token: token))
+        isLoading = true
+        defer { isLoading = false }
+        
+        await loadComments()
+    }
+    
+    @MainActor
+    func loadMoreComments(id: UUID) async {
+        if comments.last?.id != id {
+            return
         }
         
-        await MainActor.run {
-            isLoading = false
+        isMoreLoading = true
+        defer { isMoreLoading = false }
+        
+        await loadComments()
+    }
+    
+    func loadComments() async {
+        var buffer: [CommentData] = []
+        
+        do {
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
+            
+            let decodedComments: CommentResponseDTO = try JSONDecoder().decode(CommentResponseDTO.self, from: response)
+            
+            for comment in decodedComments.comments {
+                await buffer.append(CommentData.construct(comment: comment, token: token))
+            }
+            
+            offset += limit
+            
+            buffer = buffer.filter { newComment in !comments.contains(where: { comment in
+                comment.id == newComment.id
+            })}
+            
+            comments.append(contentsOf: buffer)
+        } catch {
+            logger.debug("An error occurred while loading comments: \(error)")
         }
     }
 
