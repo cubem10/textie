@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import os
 
 struct ProfileView: View {
     @Environment(UserStateViewModel.self) var userStateViewModel
@@ -13,6 +14,7 @@ struct ProfileView: View {
     @State private var viewModel: ProfileViewModel = .init()
     @State private var editingProfile: Bool = false
     var uuid: UUID
+    private let logger = Logger()
     
     var body: some View {
         let isMyProfile: Bool = uuid == userStateViewModel.uuid
@@ -47,7 +49,7 @@ struct ProfileView: View {
                                 Button(action: {
                                     Task {
                                         let logoutStatus: Bool = await userStateViewModel.logout()
-                                        print("logoutStatus: \(logoutStatus)")
+                                        logger.debug("logoutStatus: \(logoutStatus)")
                                     }
                                 }) {
                                     Text("LOGOUT")

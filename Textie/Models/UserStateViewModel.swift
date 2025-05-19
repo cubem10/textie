@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 
 @Observable
 class UserStateViewModel {
@@ -15,6 +16,8 @@ class UserStateViewModel {
     
     var uuid: UUID = UUID()
     var token: String = ""
+    
+    private let logger = Logger()
     
     init() {
         Task {
@@ -29,7 +32,7 @@ class UserStateViewModel {
                     isLoggedIn = true
                 }
             } catch {
-                print("An error occurred while initializing the app: \(error), access token found: \(token != "")")
+                logger.debug("An error occurred while initializing the app: \(error), access token found: \(self.token != "")")
             }
         }
     }

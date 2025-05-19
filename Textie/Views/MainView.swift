@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import os
 
 struct MainView: View {
     @Environment(UserStateViewModel.self) var viewModel
     @State private var timer: Timer?
     @SceneStorage("selectedTab") private var selection: Int = 0
+    
+    private let logger = Logger()
     
     var body: some View {
         TabView(selection: $selection) {
@@ -33,11 +36,11 @@ struct MainView: View {
                     do {
                         let result = try await viewModel.refreshSession()
                         if !result {
-                            print("Token automatic refresh failed.")
+                            logger.debug("Token automatic refresh failed.")
                             // TODO: error handling
                         }
                     } catch {
-                        print("Token automatic refresh failed. \(error)")
+                        logger.debug("Token automatic refresh failed. \(error)")
                         // TODO: error handling
                     }
                 }

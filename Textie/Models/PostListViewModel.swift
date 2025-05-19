@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import os
 
 @Observable
 class PostListViewModel {
+    private let logger = Logger()
+    
     var isLoading = false
     
     var postDatas: [PostData] = []
@@ -26,7 +29,7 @@ class PostListViewModel {
                 try await loadPost(token: token)
                 offset += limit
             } catch {
-                print("An error occurred while loading more posts: \(error), current offset: \(offset)")
+                logger.debug("An error occurred while loading more posts: \(error), current offset: \(self.offset)")
             }
         }
     }
@@ -62,7 +65,7 @@ class PostListViewModel {
         do {
             try await loadPost(token: token)
         } catch {
-            print("An error occurred while fetching posts: \(error), current offset: \(offset)")
+            logger.debug("An error occurred while fetching posts: \(error), current offset: \(self.offset)")
         }
     }
 }
