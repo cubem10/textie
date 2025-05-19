@@ -27,7 +27,7 @@ struct PostDataDTO: Identifiable, Decodable {
     }
 }
 
-struct PostData: Identifiable, Decodable {
+struct PostData: Identifiable, Hashable, Decodable {
     let id: UUID
     let name: String
     let title: String

@@ -30,11 +30,14 @@ struct PostListView: View {
                         Spacer()
                     }
                     
-                List(viewModel.postDatas) { postData in
-                        PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                    List(viewModel.postDatas) { postData in
+                        PostElementView(postData: postData)
+                            .padding()
+                            .listRowInsets(EdgeInsets())
                             .task {
                                 await viewModel.loadMorePost(id: postData.id)
-                            }.alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                            }
+                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                     }.listStyle(.plain)
                 }
                 Spacer()
