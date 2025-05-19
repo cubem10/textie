@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PostListView: View {
-    @StateObject private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
+    @State private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
     @Environment(UserStateViewModel.self) var userStateViewModel
     
     private var offset: Int = 0
@@ -30,9 +30,11 @@ struct PostListView: View {
                         Spacer()
                     }
                     
-                    let posts = viewModel.postDatas
-                    List(posts) { postData in
+                List(viewModel.postDatas) { postData in
                         PostElementView(postData: postData).padding().listRowInsets(EdgeInsets())
+                            .task {
+                                await viewModel.loadMorePost(id: postData.id)
+                            }
                     }.listStyle(.plain)
                 }
                 Spacer()
@@ -40,7 +42,7 @@ struct PostListView: View {
         }
         .padding()
         .task {
-            await viewModel.loadPost(token: userStateViewModel.token, offset: offset, limit: limit)
+            await viewModel.loadInitialPost(token: userStateViewModel.token)
         }
     }
 }

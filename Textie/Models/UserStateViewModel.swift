@@ -114,6 +114,9 @@ class UserStateViewModel {
         guard let refreshToken: String = getTokenFromKeychain(key: "refresh_token") else {
             return false
         }
+        
+        token = refreshToken
+        
         return parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0)
     }
     

@@ -46,7 +46,7 @@ struct ProfileView: View {
                             VStack {
                                 Button(action: {
                                     Task {
-                                        let logoutStatus: Bool = await userStateViewModel.logout()
+                                        let _: Bool = await userStateViewModel.logout()
                                     }
                                 }) {
                                     Text("LOGOUT")
