@@ -10,7 +10,7 @@ import SwiftUI
 struct ProfileImageView: View {
     @Environment(\.colorScheme) var colorScheme
     var body: some View {
-        Image(systemName: "person.circle.fill").resizable().foregroundStyle(colorScheme == .dark ? .white : .black).clipShape(Circle())
+        Image(systemName: "person.crop.circle.fill").resizable().foregroundStyle(colorScheme == .dark ? .white : .black).clipShape(Circle())
     }
 }
 
