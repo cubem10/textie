@@ -31,7 +31,7 @@ struct PostData: Identifiable, Decodable {
     let id: UUID
     let name: String
     let title: String
-    let createdAt: String
+    let createdAt: Date
     let userId: UUID
     let isEdited: Bool
     
@@ -57,7 +57,7 @@ extension PostData {
             id: post.id,
             name: nickname,
             title: post.title,
-            createdAt: String.formatRelativeDate(post.createdAt),
+            createdAt: String.convertToDate(post.createdAt),
             userId: post.userId,
             isEdited: post.isEdited,
             content: post.content,
@@ -67,13 +67,19 @@ extension PostData {
 }
 
 extension String {
-    static func formatRelativeDate(_ dateString: String) -> String {
+    static func convertToDate(_ dateString: String) -> Date {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         let date = dateFormatter.date(from: dateString)!
         
+        return date
+    }
+}
+
+extension Date {
+    static func relativeTime(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: date, relativeTo: Date())
@@ -110,7 +116,7 @@ struct CommentDataDTO: Identifiable, Decodable {
 struct CommentData: Identifiable, Decodable {
     let id: UUID
     let name: String
-    let createdAt: String
+    let createdAt: Date
     var content: String
 }
 
@@ -129,7 +135,7 @@ extension CommentData {
         return CommentData(
             id: comment.id,
             name: nickname,
-            createdAt: String.formatRelativeDate(comment.createdAt),
+            createdAt: String.convertToDate(comment.createdAt),
             content: comment.content
         )
     }

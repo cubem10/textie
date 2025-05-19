@@ -25,5 +25,5 @@ struct CommentElementView: View {
 }
 
 #Preview {
-    CommentElementView(commentData: CommentData(id: UUID(), name: "John", createdAt: "1시간 전", content: "placeholder text"))
+    CommentElementView(commentData: CommentData(id: UUID(), name: "John", createdAt: Date(), content: "placeholder text"))
 }
