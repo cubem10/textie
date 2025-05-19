@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import os
 
 struct ProfileEditView: View {
     @Environment(UserStateViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
     @State var newNickname: String
+    @State var showErrorAlert: Bool = false
+    
+    var logger = Logger()
     
     var body: some View {
         VStack {
@@ -23,7 +27,10 @@ struct ProfileEditView: View {
                             let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.token)
                             let _ = try await viewModel.refreshSession()
                         } catch {
-                            // TODO: error handling
+                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                logger.debug("/user endpoint returned status code \(statusCode)")
+                                showErrorAlert = true
+                            }
                         }
                     }
                 }) {
@@ -39,6 +46,10 @@ struct ProfileEditView: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+        }.alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
+            Button("CONFIRM") { }
+        } message: {
+            Text("REQUEST_PROCESSING_ERROR_DETAILS")
         }
     }
 }

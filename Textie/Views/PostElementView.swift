@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import os
 
 struct PostElementView: View {
     var postData: PostData
@@ -16,9 +17,12 @@ struct PostElementView: View {
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
+    @State private var showErrorAlert: Bool = false
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
+    
+    private let logger = Logger()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -50,7 +54,10 @@ struct PostElementView: View {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: userStateViewModel.token)
                             liked.toggle()
                         } catch {
-                            // TODO: error handling
+                                if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                    logger.debug("/like \(liked ? "DELETE" : "POST") response status code: \(statusCode)")
+                                    showErrorAlert.toggle()
+                                }
                         }
                     }
                 }
@@ -93,7 +100,10 @@ struct PostElementView: View {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
                             let _ = try await userStateViewModel.refreshSession()
                         } catch {
-                            // TODO: error handling
+                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                logger.debug("/post DELETE response status code: \(statusCode)")
+                                showErrorAlert.toggle()
+                            }
                         }
                     }
                 },
@@ -121,6 +131,11 @@ struct PostElementView: View {
                     }
                     ProfileView(uuid: postData.userId)
                 }.padding()
+            }
+            .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
+                Button("CONFIRM") { }
+            } message: {
+                Text("REQUEST_PROCESSING_ERROR_DETAILS")
             }
         
     }

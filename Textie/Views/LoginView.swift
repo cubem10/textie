@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import os
 
 struct LoginView: View {
     @State private var username = ""
@@ -17,6 +18,8 @@ struct LoginView: View {
     @State private var showRegisterView = false
     @State private var loginFailed: Bool = false
 
+    private var logger = Logger()
+    
     @Environment(UserStateViewModel.self) var userStateViewModel
     
     var body: some View {
@@ -35,8 +38,10 @@ struct LoginView: View {
                         } catch {
                             if let error = error as? BackendError, case .invalidCredential = error {
                                 invaildCredentials = true
-                            }
-                            else {
+                            } else if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                logger.debug("/signin endpoint returned status code \(statusCode)")
+                                loginFailed = true
+                            } else {
                                 loginFailed = true
                             }
                         }
@@ -53,6 +58,9 @@ struct LoginView: View {
                                 do {
                                     try await userStateViewModel.login(username: username, password: password)
                                 } catch {
+                                    if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                        logger.debug("/signin endpoint returned status code \(statusCode)")
+                                    }
                                     loginFailed = true
                                 }
                             }

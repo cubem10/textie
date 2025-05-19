@@ -18,5 +18,10 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
+    
+    if let response = response as? HTTPURLResponse, response.statusCode >= 400 {
+        throw BackendError.invalidResponse(statusCode: response.statusCode)
+    }
+    
     return (responseData, response)
 }

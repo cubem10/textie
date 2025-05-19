@@ -35,7 +35,7 @@ enum KeyChainError: Error {
 enum BackendError: Error {
     case badURL
     case badEncoding
-    case invaildResponse
+    case invalidResponse(statusCode: Int)
     case invalidCredential
     case existingUserRegistration
 }

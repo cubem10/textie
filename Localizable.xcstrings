@@ -69,6 +69,22 @@
         }
       }
     },
+    "CONFIRM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
+          }
+        }
+      }
+    },
     "CONTAINS_NUMBERS" : {
       "localizations" : {
         "en" : {
@@ -702,6 +718,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "게시글 삭제 확인"
+          }
+        }
+      }
+    },
+    "REQUEST_PROCESSING_ERROR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오류"
+          }
+        }
+      }
+    },
+    "REQUEST_PROCESSING_ERROR_DETAILS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred while processing the request. "
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "요청을 처리하는 중 오류가 발생했습니다. "
           }
         }
       }

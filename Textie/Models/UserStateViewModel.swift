@@ -94,28 +94,28 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        let (data, response): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST")
-        if let response = response as? HTTPURLResponse, response.statusCode == 400 { // Bad Request: Invalid credentials
-            throw BackendError.invalidCredential
+        do {
+            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST")
+            isLoggedIn = parseTokenResponse(encodedResponse: data)
+        } catch {
+            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error, statusCode == 400 {
+                throw BackendError.invalidCredential
+            }
         }
-        isLoggedIn = parseTokenResponse(encodedResponse: data)
     }
 
     @MainActor
-    func register(username: String, password: String, nickname: String, onError: @escaping (Error) -> Void) async throws {
+    func register(username: String, password: String, nickname: String) async throws {
         isLoading = true
         defer { isLoading = false }
         
         do {
-            let response: (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
-            
-            if let response = response.1 as? HTTPURLResponse, response.statusCode == 500 {
+            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
+            isLoggedIn = parseTokenResponse(encodedResponse: data)
+        } catch {
+            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error, statusCode == 500 {
                 throw BackendError.existingUserRegistration
             }
-            
-            isLoggedIn = parseTokenResponse(encodedResponse: response.0)
-        } catch {
-            onError(error)
         }
         
     }

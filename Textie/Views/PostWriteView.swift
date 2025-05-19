@@ -6,16 +6,20 @@
 //
 
 import SwiftUI
+import os
 
 struct PostWriteView: View {
     @State var title: String
     @State var context: String
+    @State var showErrorAlert: Bool = false
 
     var postId: UUID?
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
+    
+    var logger = Logger()
     
     var body: some View {
         let isEditing: Bool = postId != nil
@@ -39,7 +43,10 @@ struct PostWriteView: View {
                                 let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: userStateViewModel.token)
                             }
                         } catch {
-                            // TODO: error handling
+                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
+                                logger.debug("/posts endpoint returned status code: \(statusCode)")
+                                showErrorAlert = true
+                            }
                         }
                     }
                 }) {
@@ -70,6 +77,11 @@ struct PostWriteView: View {
         }
         Spacer()
         }.padding()
+            .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
+                Button("CONFIRM") { }
+            } message: {
+                Text("REQUEST_PROCESSING_ERROR_DETAILS")
+            }
     }
 }
 
