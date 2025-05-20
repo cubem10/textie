@@ -15,6 +15,7 @@ struct PostDataDTO: Identifiable, Decodable {
     let id: UUID
     let userId: UUID
     let updatedAt: String?
+    let liked: Bool
     
     enum CodingKeys: String, CodingKey {
         case isEdited = "is_edited"
@@ -24,6 +25,7 @@ struct PostDataDTO: Identifiable, Decodable {
         case id
         case userId = "user_id"
         case updatedAt = "updated_at"
+        case liked
     }
 }
 
@@ -35,6 +37,7 @@ struct PostData: Identifiable, Hashable, Decodable {
     let userId: UUID
     let isEdited: Bool
     
+    var isLiked: Bool
     var content: String
     var likes: Int
 }
@@ -54,6 +57,7 @@ extension PostData {
             createdAt: String.convertToDate(post.createdAt),
             userId: post.userId,
             isEdited: post.isEdited,
+            isLiked: post.liked,
             content: post.content,
             likes: likes
         )

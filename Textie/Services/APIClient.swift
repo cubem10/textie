@@ -20,11 +20,11 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     
     let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
     
+    print("response to endpoint: \(endpoint) -> \(String(data: responseData, encoding: .utf8) ?? "")")
+    
     if let response = response as? HTTPURLResponse, response.statusCode >= 400 {
         throw BackendError.invalidResponse(statusCode: response.statusCode)
     }
-    
-    print("response to endpoint: \(endpoint) -> \(String(data: responseData, encoding: .utf8) ?? "")")
     
     return (responseData, response)
 }

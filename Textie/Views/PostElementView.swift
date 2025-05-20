@@ -9,15 +9,13 @@ import SwiftUI
 import os
 
 struct PostElementView: View {
-    var postData: PostData
+    @State var postData: PostData
     @State private var showComment: Bool = false
-    @State private var liked: Bool = false
     @State private var commentDatas: [CommentData] = []
     @State private var showDialog: Bool = false
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
-    
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
     
@@ -48,13 +46,14 @@ struct PostElementView: View {
                 .lineLimit(nil)
             HStack {
                 Group {
-                    if liked { Image(systemName: "heart.fill") }
+                    if postData.isLiked { Image(systemName: "heart.fill") }
                     else { Image(systemName: "heart") }
                 }.onTapGesture {
                     Task {
                         do {
-                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: userStateViewModel.token)
-                            liked.toggle()
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: postData.isLiked ? "DELETE" : "POST", withToken: userStateViewModel.token)
+                            postData.isLiked.toggle()
+                            postData.likes += postData.isLiked ? 1 : -1
                         } catch {
                                 if (error as? URLError) != nil {
                                     errorMessage = error.localizedDescription
@@ -144,5 +143,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, isLiked: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
 }

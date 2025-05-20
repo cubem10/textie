@@ -35,7 +35,7 @@ class PostListViewModel {
     func loadPost(token: String) async {
         var buffer: [PostData] = []
         do {
-            let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
+            let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
             
             let decodedPostResponse: [PostDataDTO] = try JSONDecoder().decode([PostDataDTO].self, from: postResponseData)
                     
@@ -63,6 +63,8 @@ class PostListViewModel {
         
         guard !isLoading else { return }
 
+        postDatas.removeAll()
+        
         isLoading = true
         defer { isLoading = false }
         offset = 0
