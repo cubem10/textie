@@ -2,7 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "shouldTranslate" : false
     },
     "⋅" : {
       "shouldTranslate" : false
@@ -201,6 +201,40 @@
         }
       }
     },
+    "EXISTING_USER_DETAIL" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User with this username already exists."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동일한 ID의 사용자가 이미 존재합니다. "
+          }
+        }
+      }
+    },
+    "EXISTING_USER_TITLE" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Register Failed"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원 가입 실패"
+          }
+        }
+      }
+    },
     "INVAILD_CREDENTIAL_DETAILS" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -234,6 +268,9 @@
           }
         }
       }
+    },
+    "INVALID_CREDENTIAL_DETAILS" : {
+
     },
     "LOADING_MESSAGE" : {
       "localizations" : {
@@ -626,39 +663,18 @@
         }
       }
     },
-    "REGISTER_FAIL_DETAIL" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "User with this username already exists."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "동일한 ID의 사용자가 이미 존재합니다. "
-          }
-        }
-      }
-    },
     "REGISTER_FAIL_TITLE" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Register Failed"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "회원 가입 실패"
-          }
         }
       }
+    },
+    "REGISTER_LOADING_TEXT" : {
+
     },
     "REGISTER_MAIN_TEXT" : {
       "extractionState" : "manual",

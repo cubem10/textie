@@ -94,14 +94,9 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        do {
-            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST")
-            isLoggedIn = parseTokenResponse(encodedResponse: data)
-        } catch {
-            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error, statusCode == 400 {
-                throw BackendError.invalidCredential
-            }
-        }
+        let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signin?username=\(username)&password=\(password)", httpMethod: "POST")
+        isLoggedIn = parseTokenResponse(encodedResponse: data)
+        
     }
 
     @MainActor
@@ -109,14 +104,8 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        do {
-            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
-            isLoggedIn = parseTokenResponse(encodedResponse: data)
-        } catch {
-            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error, statusCode == 500 {
-                throw BackendError.existingUserRegistration
-            }
-        }
+        let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/signup?username=\(username)&password=\(password)&nickname=\(nickname)", httpMethod: "POST")
+        isLoggedIn = parseTokenResponse(encodedResponse: data)
         
     }
 

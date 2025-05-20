@@ -26,6 +26,7 @@ struct IdFieldView: View {
                 .textContentType(.username)
                 .autocapitalization(.none)
                 .autocorrectionDisabled(true)
+                .keyboardType(.asciiCapable)
                 .onChange(of: id) { _, newValue in
                     if !isValidID(newValue) {
                         id = String(id.dropLast(1))
@@ -58,6 +59,7 @@ struct NicknameFieldView: View {
                 .textContentType(.username)
                 .autocapitalization(.none)
                 .autocorrectionDisabled(true)
+                .keyboardType(.asciiCapable)
         }
     }
 }

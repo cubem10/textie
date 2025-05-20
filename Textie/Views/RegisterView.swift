@@ -15,7 +15,9 @@ struct RegisterView: View {
     @Binding var nickname: String
     
     @State private var verifyPassword: String = ""
-    @State private var existingUser: Bool = false
+    
+    @State private var registerFailDetail: String = ""
+    @State private var showAlert: Bool = false
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     
@@ -42,20 +44,29 @@ struct RegisterView: View {
                     do {
                         try await userStateViewModel.register(username: username, password: password, nickname: nickname)
                     } catch {
-                        if let error = error as? BackendError, case .existingUserRegistration = error {
-                            existingUser = true
+                        if let error = error as? BackendError {
+                            registerFailDetail = error.localizedDescription
+                            if case .invalidResponse(let statusCode) = error, statusCode == 500 {
+                                registerFailDetail = String(localized: "EXISTING_USER_DETAIL")
+                            }
+                            else {
+                                registerFailDetail = error.localizedDescription
+                            }
+                            showAlert = true
                         }
                     }
                 }
             }) {
                 Text("REGISTER_BUTTON")
                     .disabled(username == "" || password.count < 8 || password != verifyPassword || nickname == "" || password.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil || password.rangeOfCharacter(from: CharacterSet(charactersIn:"!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?`~")) == nil)
-                    .alert(isPresented: $existingUser) {
-                        Alert(title: Text("REGISTER_FAIL_TITLE"), message: Text("REGISTER_FAIL_DETAIL"))
-                    }
             }
-            
+            if userStateViewModel.isLoading {
+                ProgressView("REGISTER_LOADING_TEXT")
+            }
         }.padding()
+            .alert("REGISTER_FAIL_TITLE", isPresented: $showAlert, actions: { }, message: {
+                Text(registerFailDetail)
+            })
         
     }
 }

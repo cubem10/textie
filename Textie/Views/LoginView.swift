@@ -14,9 +14,11 @@ struct LoginView: View {
     @State private var password = ""
     @State private var nickname = ""
     
-    @State private var invaildCredentials = false
     @State private var showRegisterView = false
-    @State private var loginFailed: Bool = false
+
+    @State private var alertMessage: String = ""
+    
+    @State private var showAlert: Bool = false
 
     private var logger = Logger()
     
@@ -33,18 +35,7 @@ struct LoginView: View {
             HStack {
                 Button(action: {
                     Task {
-                        do {
-                            try await userStateViewModel.login(username: username, password: password)
-                        } catch {
-                            if let error = error as? BackendError, case .invalidCredential = error {
-                                invaildCredentials = true
-                            } else if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                logger.debug("/signin endpoint returned status code \(statusCode)")
-                                loginFailed = true
-                            } else {
-                                loginFailed = true
-                            }
-                        }
+                        await login(username: username, password: password)
                     }
                 }) {
                     Text("SIGNIN_BUTTON")
@@ -55,28 +46,34 @@ struct LoginView: View {
                     RegisterView(showRegisterView: $showRegisterView, username: $username, password: $password, nickname: $nickname)
                         .onChange(of: showRegisterView) {
                             Task {
-                                do {
-                                    try await userStateViewModel.login(username: username, password: password)
-                                } catch {
-                                    if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                        logger.debug("/signin endpoint returned status code \(statusCode)")
-                                    }
-                                    loginFailed = true
-                                }
+                                await login(username: username, password: password)
                             }
                         }
-                }
-                .alert(isPresented: $loginFailed) {
-                    Alert(title: Text("LOGIN_FAIL"), message: Text("LOGIN_FAIL_DETAIL"))
-                }
-                .alert(isPresented: $invaildCredentials) {
-                    Alert(title: Text("INVALID_CREDENTIAL"), message: Text("INVAILD_CREDENTIAL_DETAILS"))
                 }
             }
             if userStateViewModel.isLoading {
                 ProgressView("LOGIN_LOADING_MESSAGE")
             }
         }.padding()
+            .alert("LOGIN_FAIL", isPresented: $showAlert, actions: { }, message: {
+                Text(alertMessage)
+            })
+    }
+    
+    private func login(username: String, password: String) async {
+        do {
+            try await userStateViewModel.login(username: username, password: password)
+        } catch {
+            if let error = error as? BackendError {
+                if case .invalidResponse(let statusCode) = error, statusCode == 400 {
+                    logger.debug("/signin endpoint returned status code \(statusCode)")
+                    alertMessage = String(localized: "INVALID_CREDENTIAL_DETAILS")
+                }
+            } else {
+                alertMessage = error.localizedDescription
+            }
+            showAlert = true
+        }
     }
 }
 
