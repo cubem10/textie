@@ -399,6 +399,9 @@
         }
       }
     },
+    "NETWORK_ERROR" : {
+
+    },
     "NETWORK_ERROR_TITLE" : {
       "localizations" : {
         "en" : {
@@ -789,6 +792,7 @@
       }
     },
     "REQUEST_PROCESSING_ERROR_DETAILS" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

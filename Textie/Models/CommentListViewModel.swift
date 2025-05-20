@@ -21,6 +21,9 @@ class CommentListViewModel {
     
     private var logger = Logger()
     
+    var showFailAlert: Bool = false
+    var failDetail: String = ""
+    
     var comments: [CommentData] = []
     
     init(offset: Int, limit: Int) {
@@ -63,7 +66,7 @@ class CommentListViewModel {
             let decodedComments: CommentResponseDTO = try JSONDecoder().decode(CommentResponseDTO.self, from: response)
             
             for comment in decodedComments.comments {
-                await buffer.append(CommentData.construct(comment: comment, token: token))
+                try await buffer.append(CommentData.construct(comment: comment, token: token))
             }
             
             offset += limit
@@ -74,7 +77,10 @@ class CommentListViewModel {
             
             comments.append(contentsOf: buffer)
         } catch {
-            logger.debug("An error occurred while loading comments: \(error)")
+            if (error as? URLError) != nil {
+                failDetail = error.localizedDescription
+                showFailAlert = true
+            }
         }
     }
 

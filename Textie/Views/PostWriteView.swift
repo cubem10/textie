@@ -12,6 +12,7 @@ struct PostWriteView: View {
     @State var title: String
     @State var context: String
     @State var showErrorAlert: Bool = false
+    @State var errorMessage: String = ""
 
     var postId: UUID?
     
@@ -48,9 +49,9 @@ struct PostWriteView: View {
                                 selectedTab = 0
                             }
                         } catch {
-                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                logger.debug("/posts endpoint returned status code: \(statusCode)")
-                                showErrorAlert = true
+                            if (error as? URLError) != nil {
+                                errorMessage = error.localizedDescription
+                                showErrorAlert.toggle()
                             }
                         }
                     }
@@ -87,7 +88,7 @@ struct PostWriteView: View {
             .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
                 Button("CONFIRM") { }
             } message: {
-                Text("REQUEST_PROCESSING_ERROR_DETAILS")
+                Text(errorMessage)
             }
     }
 }

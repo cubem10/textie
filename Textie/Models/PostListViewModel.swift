@@ -19,34 +19,39 @@ class PostListViewModel {
     var offset: Int = 0
     var limit: Int = 10
     
+    var showFailAlert: Bool = false
+    var failDetail: String = ""
+    
     init(offset: Int, limit: Int) {
         self.postDatas = []
     }
     
     func loadMorePost(id: UUID) async {
         if id == postDatas.last?.id {
-            do {
-                try await loadPost(token: token)
-                offset += limit
-            } catch {
-                logger.debug("An error occurred while loading more posts: \(error), current offset: \(self.offset)")
-            }
+            await loadPost(token: token)
         }
     }
     
-    func loadPost(token: String) async throws {
+    func loadPost(token: String) async {
         var buffer: [PostData] = []
         
-        let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
-        
-        let decodedPostResponse: [PostDataDTO] = try JSONDecoder().decode([PostDataDTO].self, from: postResponseData)
+        do {
+            let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
+            
+            let decodedPostResponse: [PostDataDTO] = try JSONDecoder().decode([PostDataDTO].self, from: postResponseData)
+                    
+            for postDataDTO in decodedPostResponse {
+                let (likeResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET")
                 
-        for postDataDTO in decodedPostResponse {
-            let (likeResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET")
-            
-            let decodedLikesResponse: LikeDataDTO = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData)
-            
-            await buffer.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
+                let decodedLikesResponse: LikeDataDTO = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData)
+                
+                try await buffer.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
+            }
+        } catch {
+            if (error as? URLError) != nil {
+                failDetail = error.localizedDescription
+                showFailAlert = true
+            }
         }
         
         buffer = buffer.filter { newItem in !postDatas.contains(where: { post in post.id == newItem.id}) }
@@ -63,10 +68,6 @@ class PostListViewModel {
         defer { isLoading = false }
         offset = 0
         
-        do {
-            try await loadPost(token: token)
-        } catch {
-            logger.debug("An error occurred while fetching posts: \(error), current offset: \(self.offset)")
-        }
+        await loadPost(token: token)
     }
 }

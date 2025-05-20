@@ -16,8 +16,9 @@ struct CommentListView: View {
     @State var newComment: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State var showErrorAlert: Bool = false
+    
     var body: some View {
+        @Bindable var viewModel: CommentListViewModel = viewModel
         VStack {
             Text("COMMENTS")
                 .font(.title)
@@ -61,9 +62,9 @@ struct CommentListView: View {
                             do {
                                 let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?content=\(newComment)", httpMethod: "POST", withToken: userStateViewModel.token)
                             } catch {
-                                if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                    logger.debug("/comment POST request failed with status code: \(statusCode)")
-                                    showErrorAlert = true
+                                if (error as? URLError) != nil {
+                                    viewModel.failDetail = error.localizedDescription
+                                    viewModel.showFailAlert = true
                                 }
                             }
                             await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
@@ -80,10 +81,10 @@ struct CommentListView: View {
         .task {
             await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
         }
-        .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
+        .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert) {
             Button("CONFIRM") { }
         } message: {
-            Text("REQUEST_PROCESSING_ERROR_DETAILS")
+            Text(viewModel.failDetail)
         }
     }
 }

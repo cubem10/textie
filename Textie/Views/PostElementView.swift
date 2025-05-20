@@ -17,7 +17,9 @@ struct PostElementView: View {
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
+    
     @State private var showErrorAlert: Bool = false
+    @State private var errorMessage: String = ""
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -54,8 +56,8 @@ struct PostElementView: View {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: liked ? "DELETE" : "POST", withToken: userStateViewModel.token)
                             liked.toggle()
                         } catch {
-                                if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                    logger.debug("/like \(liked ? "DELETE" : "POST") response status code: \(statusCode)")
+                                if (error as? URLError) != nil {
+                                    errorMessage = error.localizedDescription
                                     showErrorAlert.toggle()
                                 }
                         }
@@ -100,8 +102,8 @@ struct PostElementView: View {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
                             let _ = await userStateViewModel.refreshSession()
                         } catch {
-                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                logger.debug("/post DELETE response status code: \(statusCode)")
+                            if (error as? URLError) != nil {
+                                errorMessage = error.localizedDescription
                                 showErrorAlert.toggle()
                             }
                         }
@@ -135,7 +137,7 @@ struct PostElementView: View {
             .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
                 Button("CONFIRM") { }
             } message: {
-                Text("REQUEST_PROCESSING_ERROR_DETAILS")
+                Text(errorMessage)
             }
         
     }

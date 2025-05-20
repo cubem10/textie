@@ -13,6 +13,7 @@ struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
     @State var newNickname: String
     @State var showErrorAlert: Bool = false
+    @State var errorMessage: String = ""
     
     var logger = Logger()
     
@@ -27,9 +28,9 @@ struct ProfileEditView: View {
                             let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.token)
                             let _ = await viewModel.refreshSession()
                         } catch {
-                            if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
-                                logger.debug("/user endpoint returned status code \(statusCode)")
-                                showErrorAlert = true
+                            if (error as? URLError) != nil {
+                                errorMessage = error.localizedDescription
+                                showErrorAlert.toggle()
                             }
                         }
                     }
@@ -49,7 +50,7 @@ struct ProfileEditView: View {
         }.alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
             Button("CONFIRM") { }
         } message: {
-            Text("REQUEST_PROCESSING_ERROR_DETAILS")
+            Text(errorMessage)
         }
     }
 }

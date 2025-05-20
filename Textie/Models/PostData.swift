@@ -40,18 +40,12 @@ struct PostData: Identifiable, Hashable, Decodable {
 }
 
 extension PostData {
-    static func construct(post: PostDataDTO, likes: Int = 0, token: String) async -> PostData {
+    static func construct(post: PostDataDTO, likes: Int = 0, token: String) async throws -> PostData {
         var nickname: String = ""
         
-        
-        do {
-            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(post.userId)", httpMethod: "GET", withToken: token)
-            let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
-            nickname = decodedResponse.nickname
-        } catch {
-            // TODO: error handling
-        }
-        
+        let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(post.userId)", httpMethod: "GET", withToken: token)
+        let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
+        nickname = decodedResponse.nickname
         
         return PostData(
             id: post.id,
@@ -121,16 +115,12 @@ struct CommentData: Identifiable, Decodable {
 }
 
 extension CommentData {
-    static func construct(comment: CommentDataDTO, token: String) async -> CommentData  {
+    static func construct(comment: CommentDataDTO, token: String) async throws -> CommentData  {
         var nickname: String = ""
         
-        do {
-            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(comment.userId)", httpMethod: "GET", withToken: token)
-            let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
-            nickname = decodedResponse.nickname
-        } catch {
-            // TODO: error handling
-        }
+        let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(comment.userId)", httpMethod: "GET", withToken: token)
+        let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
+        nickname = decodedResponse.nickname
         
         return CommentData(
             id: comment.id,

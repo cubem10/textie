@@ -15,6 +15,7 @@ struct PostListView: View {
     private let limit: Int = 10
     
     var body: some View {
+        @Bindable var viewModel: PostListViewModel = viewModel
         VStack(alignment: .leading) {
             Group {
                 if viewModel.isLoading {
@@ -52,6 +53,9 @@ struct PostListView: View {
                 await viewModel.loadInitialPost(token: userStateViewModel.token)
             }
         }
+        .alert("NETWORK_ERROR", isPresented: $viewModel.showFailAlert, actions: { }, message: {
+            Text(viewModel.failDetail)
+        })
     }
 }
 
