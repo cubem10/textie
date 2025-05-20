@@ -98,7 +98,7 @@ struct PostElementView: View {
                     Task {
                         do {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
-                            let _ = try await userStateViewModel.refreshSession()
+                            let _ = await userStateViewModel.refreshSession()
                         } catch {
                             if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
                                 logger.debug("/post DELETE response status code: \(statusCode)")

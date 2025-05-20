@@ -13,6 +13,8 @@ class UserStateViewModel {
     var isLoggedIn: Bool = false
     var isLoading: Bool = false
     var isRetrievingUUID: Bool = false
+    var showFailAlert: Bool = false
+    var failDetail: String = ""
     
     var uuid: UUID = UUID()
     var token: String = ""
@@ -27,7 +29,7 @@ class UserStateViewModel {
                     throw BackendError.invalidCredential
                 }
                 token = accessToken
-                let refreshResult: Bool = try await refreshSession()
+                let refreshResult: Bool = await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
                 }
@@ -110,7 +112,7 @@ class UserStateViewModel {
     }
 
     @MainActor
-    func refreshSession() async throws -> Bool {
+    func refreshSession() async -> Bool {
         isLoading = true
         defer { isLoading = false }
         
@@ -120,7 +122,14 @@ class UserStateViewModel {
         
         token = refreshToken
         
-        return parseTokenResponse(encodedResponse: try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST").0)
+        do {
+            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST")
+            return parseTokenResponse(encodedResponse: data)
+        } catch {
+            failDetail = error.localizedDescription
+            showFailAlert = true
+            return false
+        }
     }
     
     func logout() async -> Bool {

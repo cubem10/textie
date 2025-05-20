@@ -33,14 +33,9 @@ struct MainView: View {
         .onAppear {
             timer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { _ in
                 Task {
-                    do {
-                        let result = try await viewModel.refreshSession()
-                        if !result {
-                            logger.debug("Token automatic refresh failed.")
-                            // TODO: error handling
-                        }
-                    } catch {
-                        logger.debug("Token automatic refresh failed. \(error)")
+                    let result = await viewModel.refreshSession()
+                    if !result {
+                        logger.debug("Token automatic refresh failed.")
                         // TODO: error handling
                     }
                 }

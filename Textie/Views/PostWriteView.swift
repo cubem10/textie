@@ -41,7 +41,7 @@ struct PostWriteView: View {
                         do {
                             if isEditing {
                                 let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId!)/?title=\(title)&context=\(context)", httpMethod: "PUT", withToken: userStateViewModel.token)
-                                let _ = try await userStateViewModel.refreshSession()
+                                let _ = await userStateViewModel.refreshSession()
                                 dismiss()
                             } else {
                                 let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?title=\(title)&context=\(context)", httpMethod: "POST", withToken: userStateViewModel.token)

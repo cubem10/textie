@@ -7,6 +7,9 @@
     "⋅" : {
       "shouldTranslate" : false
     },
+    "ALERT" : {
+
+    },
     "CANCEL" : {
       "localizations" : {
         "en" : {

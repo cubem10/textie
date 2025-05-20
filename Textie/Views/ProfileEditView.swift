@@ -25,7 +25,7 @@ struct ProfileEditView: View {
                         defer { dismiss() }
                         do {
                             let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.token)
-                            let _ = try await viewModel.refreshSession()
+                            let _ = await viewModel.refreshSession()
                         } catch {
                             if let error = error as? BackendError, case .invalidResponse(let statusCode) = error {
                                 logger.debug("/user endpoint returned status code \(statusCode)")
