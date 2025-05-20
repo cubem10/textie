@@ -7,9 +7,6 @@
     "⋅" : {
       "shouldTranslate" : false
     },
-    "ALERT" : {
-
-    },
     "CANCEL" : {
       "localizations" : {
         "en" : {
@@ -238,23 +235,6 @@
         }
       }
     },
-    "INVAILD_CREDENTIAL_DETAILS" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The username or password you entered is incorrect. Please try again."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "입력한 ID나 비밀번호가 일치하지 않습니다. 다시 시도해 주세요. "
-          }
-        }
-      }
-    },
     "INVALID_CREDENTIAL" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -273,7 +253,20 @@
       }
     },
     "INVALID_CREDENTIAL_DETAILS" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The username or password you entered is incorrect. Please try again."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "입력한 ID 또는 비밀번호가 일치하지 않습니다. 다시 시도해 주세요. "
+          }
+        }
+      }
     },
     "LOADING_MESSAGE" : {
       "localizations" : {
@@ -402,6 +395,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "8글자 이상 포함"
+          }
+        }
+      }
+    },
+    "NETWORK_ERROR_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network Error"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "네트워크 오류"
           }
         }
       }
@@ -673,11 +682,30 @@
             "state" : "translated",
             "value" : "Register Failed"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원 가입 실패"
+          }
         }
       }
     },
     "REGISTER_LOADING_TEXT" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registering…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회원 가입 중…"
+          }
+        }
+      }
     },
     "REGISTER_MAIN_TEXT" : {
       "extractionState" : "manual",

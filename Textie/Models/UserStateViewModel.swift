@@ -170,6 +170,10 @@ class UserStateViewModel {
             return decodedResponse.id
         }
         catch {
+            if ((error as? URLError) != nil) {
+                failDetail = error.localizedDescription
+                showFailAlert = true
+            }
             throw BackendError.invalidCredential
         }
             
