@@ -34,7 +34,6 @@ class PostListViewModel {
     
     func loadPost(token: String) async {
         var buffer: [PostData] = []
-        
         do {
             let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
             

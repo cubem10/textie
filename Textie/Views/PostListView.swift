@@ -22,6 +22,7 @@ struct PostListView: View {
                     ProgressView("POST_LOADING_MESSAGE")
                 } else if viewModel.postDatas.isEmpty {
                     Text("NO_POST_MESSAGE")
+                    Spacer()
                 }
                 else {
                     HStack {

@@ -8,6 +8,7 @@
 import Foundation
 
 func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withToken token: String = "") async throws -> (Data, URLResponse) {
+    print("sendRequestToServer called with endpoint: \(endpoint)")
     guard let url = URL(string: endpoint) else {
         throw BackendError.badURL
     }
@@ -22,6 +23,8 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     if let response = response as? HTTPURLResponse, response.statusCode >= 400 {
         throw BackendError.invalidResponse(statusCode: response.statusCode)
     }
+    
+    print("response to endpoint: \(endpoint) -> \(String(data: responseData, encoding: .utf8) ?? "")")
     
     return (responseData, response)
 }

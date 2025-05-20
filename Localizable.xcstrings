@@ -400,9 +400,6 @@
       }
     },
     "NETWORK_ERROR" : {
-
-    },
-    "NETWORK_ERROR_TITLE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -561,6 +558,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "게시글"
+          }
+        }
+      }
+    },
+    "POST_UPLOAD_LOADING_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uploading Post…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포스트 업로드 중"
           }
         }
       }
@@ -787,23 +800,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오류"
-          }
-        }
-      }
-    },
-    "REQUEST_PROCESSING_ERROR_DETAILS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An error occurred while processing the request. "
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "요청을 처리하는 중 오류가 발생했습니다. "
           }
         }
       }

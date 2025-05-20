@@ -22,7 +22,7 @@ struct RootView: View {
             } else {
                 LoginView()
             }
-        }.alert("NETWORK_ERROR_TITLE", isPresented: $userStateViewModel.showFailAlert, actions: { }, message: {
+        }.alert("NETWORK_ERROR", isPresented: $userStateViewModel.showFailAlert, actions: { }, message: {
             Text(userStateViewModel.failDetail)
         })
     }
