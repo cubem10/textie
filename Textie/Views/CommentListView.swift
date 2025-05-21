@@ -58,16 +58,22 @@ struct CommentListView: View {
                         .font(.subheadline)
                 }
                 else {
-                    List(viewModel.comments) { commentData in
-                        CommentElementView(commentData: commentData)
-                        .listRowInsets(EdgeInsets())
-                        .padding(.vertical)
-                        .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
-                        .task {
-                            await viewModel.loadMoreComments(id: commentData.id)
+                    ScrollView {
+                        ForEach(viewModel.comments) {
+                            commentData in
+                            HStack {
+                                CommentElementView(commentData: commentData)
+                                .listRowInsets(EdgeInsets())
+                                .padding(.vertical)
+                                .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                                .task {
+                                    await viewModel.loadMoreComments(id: commentData.id)
+                                }
+                                Spacer()
+                            }
+                            Divider()
                         }
                     }
-                    .listStyle(.plain)
                 }
             }
         }
