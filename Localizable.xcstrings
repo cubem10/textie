@@ -55,8 +55,7 @@
         }
       }
     },
-    "COMMENTS" : {
-      "extractionState" : "manual",
+    "COMMENTS_TITLE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,9 +70,6 @@
           }
         }
       }
-    },
-    "COMMENTS_TITLE" : {
-
     },
     "CONFIRM" : {
       "localizations" : {
@@ -272,7 +268,20 @@
       }
     },
     "LEAVE_FIRST_COMMENT" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave first comment. "
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 댓글을 남겨 보세요. "
+          }
+        }
+      }
     },
     "LOADING_MESSAGE" : {
       "localizations" : {
@@ -421,6 +430,22 @@
         }
       }
     },
+    "NEXT_PAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음"
+          }
+        }
+      }
+    },
     "NICKNAME" : {
       "localizations" : {
         "en" : {
@@ -521,7 +546,20 @@
       }
     },
     "POST_DETAIL_VIEW_TITLE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Details"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 상세"
+          }
+        }
+      }
     },
     "POST_LOADING_MESSAGE" : {
       "localizations" : {
@@ -647,6 +685,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "제목"
+          }
+        }
+      }
+    },
+    "PREVIOUS_PAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전"
           }
         }
       }

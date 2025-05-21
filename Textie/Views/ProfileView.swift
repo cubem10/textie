@@ -64,7 +64,7 @@ struct ProfileView: View {
                             }
                         }
                         .frame(height: 100)
-                        .padding(.bottom)
+                        .padding()
                         Divider()
                         Group {
                             if viewModel.posts.isEmpty {
@@ -80,6 +80,26 @@ struct ProfileView: View {
                                                 NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
                                             )
                                     }.listStyle(.plain)
+                                    
+                                    HStack {
+                                        Button(action: {
+                                            viewModel.page = viewModel.page - 1
+                                            Task {
+                                                await viewModel.loadUserPosts(token: userStateViewModel.token, uuid: userStateViewModel.uuid)
+                                            }
+                                        }) {
+                                            Text("PREVIOUS_PAGE")
+                                        }.disabled(viewModel.page == 0)
+                                        Spacer()
+                                        Button(action: {
+                                            viewModel.page = viewModel.page + 1
+                                            Task {
+                                                await viewModel.loadUserPosts(token: userStateViewModel.token, uuid: userStateViewModel.uuid)
+                                            }
+                                        }) {
+                                            Text("NEXT_PAGE")
+                                        }.disabled(viewModel.isLastPage)
+                                    }.padding()
                                 }
                             }
                         }
@@ -93,7 +113,6 @@ struct ProfileView: View {
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)
         }
-        .padding()
         .navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
         .navigationBarTitleDisplayMode(.inline)
     }

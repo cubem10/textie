@@ -10,34 +10,47 @@ import Foundation
 @Observable
 class ProfileViewModel {
     var isLoading: Bool = false
+    var isLastPage: Bool = false
+    
     var showFailAlert: Bool = false
     var failDetail: String = ""
     
-    private var offset: Int = 0
-    private var limit: Int = 10
+    var page: Int = 0
+    private let limit: Int = 10
     
     var username: String = ""
     var nickname: String = ""
     var posts: [PostData] = []
     
+    @MainActor
     func loadUserPosts(token: String, uuid: UUID) async {
-        posts.removeAll()
+        isLoading = true
+        defer { isLoading = false }
         
+        posts.removeAll()
+        let offset: Int = page * limit
+
         do {
-            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts/", httpMethod: "GET", withToken: token)
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
             
-            guard let decodedResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: response) else {
-                return
+            let decodedResponse: [PostDataDTO] = try JSONDecoder().decode([PostDataDTO].self, from: response)
+            
+            if decodedResponse.count < 10 {
+                isLastPage = true
+            }
+            
+            else if try JSONDecoder().decode([PostDataDTO].self, from: try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts/?offset=\(offset + limit)&limit=\(limit)", httpMethod: "GET", withToken: token).0).isEmpty {
+                isLastPage = true
+            }
+            
+            else {
+                isLastPage = false
             }
             
             for postDataDTO in decodedResponse {
-                guard let (likeResponseData, _): (Data, URLResponse) = try? await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET") else {
-                    return
-                }
+                let (likeResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET")
                 
-                guard let decodedLikesResponse: LikeDataDTO = try? JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData) else {
-                    return
-                }
+                let decodedLikesResponse: LikeDataDTO = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData)
                 
                 try await posts.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
             }

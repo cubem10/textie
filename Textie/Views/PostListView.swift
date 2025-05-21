@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PostListView: View {
-    @State private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
+    @State private var viewModel: PostListViewModel = .init()
     @Environment(UserStateViewModel.self) var userStateViewModel
     
     private var offset: Int = 0
@@ -36,25 +36,43 @@ struct PostListView: View {
                         List(viewModel.postDatas) { postData in
                             PostElementView(postData: postData)
                                 .padding(.bottom)
-                                .task {
-                                    await viewModel.loadMorePost(id: postData.id)
-                                }
                                 .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                                 .background(
                                     NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
                                 )
                         }.listStyle(.plain)
+                        
+                        HStack {
+                            Button(action: {
+                                viewModel.page = viewModel.page - 1
+                                Task {
+                                    await viewModel.loadPost(token: userStateViewModel.token)
+                                }
+                            }) {
+                                Text("PREVIOUS_PAGE")
+                            }.disabled(viewModel.page == 0)
+                            Spacer()
+                            Button(action: {
+                                viewModel.page = viewModel.page + 1
+                                Task {
+                                    await viewModel.loadPost(token: userStateViewModel.token)
+                                }
+                            }) {
+                                Text("NEXT_PAGE")
+                            }.disabled(viewModel.isLastPage)
+                        }.padding()
                     }
                 }.navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
                     .navigationBarTitleDisplayMode(.inline)
             }
         }
         .task {
-            await viewModel.loadInitialPost(token: userStateViewModel.token)
+            await viewModel.loadPost(token: userStateViewModel.token)
         }
         .refreshable {
             Task {
-                await viewModel.loadInitialPost(token: userStateViewModel.token)
+                viewModel.page = 0
+                await viewModel.loadPost(token: userStateViewModel.token)
             }
         }
         .alert("NETWORK_ERROR", isPresented: $viewModel.showFailAlert, actions: { }, message: {
