@@ -46,8 +46,8 @@ struct CommentListView: View {
                 Spacer()
                 HStack {
                     TextField("", text: $newComment)
-                        .padding(.vertical, 8)
-                        .foregroundStyle(.white)
+                        .padding(8)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                         .background {
                         if newComment.count == 0 {
                             HStack {
@@ -61,6 +61,7 @@ struct CommentListView: View {
                         Task {
                             await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
                             await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+                            newComment = ""
                         }
                     }) {
                         Image(systemName: "paperplane.fill").padding(.horizontal, 8)

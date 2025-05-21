@@ -25,6 +25,8 @@ struct PostElementView: View {
     private let logger = Logger()
     
     var body: some View {
+        let isMyPost: Bool = postData.userId == userStateViewModel.uuid
+        
         VStack(alignment: .leading) {
             HStack {
                 ProfileImageView().frame(width: 30, height: 30)
@@ -50,6 +52,11 @@ struct PostElementView: View {
                     else { Image(systemName: "heart") }
                 }.onTapGesture {
                     Task {
+                        if isMyPost {
+                            errorMessage = String(localized: "SELF_LIKE_NOT_AVAILABLE")
+                            showErrorAlert.toggle()
+                            return
+                        }
                         do {
                             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: postData.isLiked ? "DELETE" : "POST", withToken: userStateViewModel.token)
                             postData.isLiked.toggle()
@@ -71,7 +78,7 @@ struct PostElementView: View {
                     .onTapGesture {
                         showComment.toggle()
                     }
-                if postData.userId == userStateViewModel.uuid {
+                if isMyPost {
                     Image(systemName: "ellipsis")
                         .onTapGesture {
                             showDialog.toggle()
