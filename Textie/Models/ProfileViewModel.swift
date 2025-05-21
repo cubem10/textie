@@ -24,7 +24,7 @@ class ProfileViewModel {
         posts.removeAll()
         
         do {
-            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts", httpMethod: "GET", withToken: token)
+            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts/", httpMethod: "GET", withToken: token)
             
             guard let decodedResponse: [PostDataDTO] = try? JSONDecoder().decode([PostDataDTO].self, from: response) else {
                 return

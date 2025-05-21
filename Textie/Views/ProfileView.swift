@@ -18,57 +18,72 @@ struct ProfileView: View {
     
     var body: some View {
         let isMyProfile: Bool = uuid == userStateViewModel.uuid
-        VStack(alignment: .leading) {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView("PROFILE_LOADING_MESSAGE")
-                }
-                else {
-                    HStack {
-                        ProfileImageView()
-                        .frame(width: 100, height: 100)
-                        .padding(.trailing)
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text(viewModel.nickname)
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                            }
-                            Button(action: {
-                                UIPasteboard.general.string = "@" + viewModel.username
-                            }) {
+        NavigationStack {
+            VStack(alignment: .leading) {
+                Group {
+                    if viewModel.isLoading {
+                        ProgressView("PROFILE_LOADING_MESSAGE")
+                    }
+                    else {
+                        HStack {
+                            ProfileImageView()
+                            .frame(width: 100, height: 100)
+                            .padding(.trailing)
+                            VStack(alignment: .leading) {
                                 HStack {
-                                    Text("@" + viewModel.username)
-                                        .font(.subheadline)
-                                    Image(systemName: "document.on.document.fill").scaleEffect(0.7)
+                                    Text(viewModel.nickname)
+                                        .font(.title)
+                                        .fontWeight(.bold)
                                 }
-                            }.foregroundStyle(colorScheme == .dark ? .white : .black)
-                            if isMyProfile {
-                                HStack {
-                                    Button(action: {
-                                        editingProfile.toggle()
-                                    }) {
-                                        Text("EDIT_PROFILE")
-                                    }.padding(.trailing)
-                                    Button(action: {
-                                        Task {
-                                            let logoutStatus: Bool = await userStateViewModel.logout()
-                                            logger.debug("logoutStatus: \(logoutStatus)")
+                                Button(action: {
+                                    UIPasteboard.general.string = "@" + viewModel.username
+                                }) {
+                                    HStack {
+                                        Text("@" + viewModel.username)
+                                            .font(.subheadline)
+                                        Image(systemName: "document.on.document.fill").scaleEffect(0.7)
+                                    }
+                                }.foregroundStyle(colorScheme == .dark ? .white : .black)
+                                if isMyProfile {
+                                    HStack {
+                                        Button(action: {
+                                            editingProfile.toggle()
+                                        }) {
+                                            Text("EDIT_PROFILE")
+                                        }.padding(.trailing)
+                                        Button(action: {
+                                            Task {
+                                                let logoutStatus: Bool = await userStateViewModel.logout()
+                                                logger.debug("logoutStatus: \(logoutStatus)")
+                                            }
+                                        }) {
+                                            Text("LOGOUT")
                                         }
-                                    }) {
-                                        Text("LOGOUT")
                                     }
                                 }
                             }
                         }
+                        .frame(height: 100)
+                        .padding(.bottom)
+                        Divider()
+                        Group {
+                            if viewModel.posts.isEmpty {
+                                Text("NO_POST_MESSAGE")
+                            }
+                            else {
+                                VStack(alignment: .leading ){
+                                    List(viewModel.posts) { postData in
+                                        PostElementView(postData: postData)
+                                            .padding(.bottom)
+                                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                                            .background(
+                                                NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
+                                            )
+                                    }.listStyle(.plain)
+                                }
+                            }
+                        }
                     }
-                    .frame(height: 100)
-                    .padding(.bottom)
-                    Divider()
-                    List(viewModel.posts, id: \.id) { post in
-                        PostElementView(postData: post).padding().listRowInsets(EdgeInsets())
-                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
-                    }.listStyle(.plain)
                 }
             }
         }
@@ -79,6 +94,8 @@ struct ProfileView: View {
             ProfileEditView(newNickname: viewModel.nickname)
         }
         .padding()
+        .navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
