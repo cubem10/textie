@@ -8,7 +8,6 @@
 import Foundation
 
 func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String, withToken token: String = "") async throws -> (Data, URLResponse) {
-    print("sendRequestToServer called with endpoint: \(endpoint)")
     guard let url = URL(string: endpoint) else {
         throw BackendError.badURL
     }
@@ -19,8 +18,6 @@ func sendRequestToServer(toEndpoint endpoint: String, httpMethod method: String,
     request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     
     let (responseData, response): (Data, URLResponse) = try await URLSession.shared.data(for: request)
-    
-    print("response to endpoint: \(endpoint) -> \(String(data: responseData, encoding: .utf8) ?? "")")
     
     if let response = response as? HTTPURLResponse, response.statusCode >= 400 {
         throw BackendError.invalidResponse(statusCode: response.statusCode)

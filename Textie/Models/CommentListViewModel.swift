@@ -84,4 +84,14 @@ class CommentListViewModel {
         }
     }
 
+    func addComment(postId: UUID, newComment: String, token: String) async {
+        do {
+            let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?content=\(newComment)", httpMethod: "POST", withToken: token)
+        } catch {
+            if (error as? URLError) != nil {
+                failDetail = error.localizedDescription
+                showFailAlert = true
+            }
+        }
+    }
 }

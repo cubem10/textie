@@ -59,14 +59,7 @@ struct CommentListView: View {
                     }
                     Button(action: {
                         Task {
-                            do {
-                                let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?content=\(newComment)", httpMethod: "POST", withToken: userStateViewModel.token)
-                            } catch {
-                                if (error as? URLError) != nil {
-                                    viewModel.failDetail = error.localizedDescription
-                                    viewModel.showFailAlert = true
-                                }
-                            }
+                            await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
                             await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
                         }
                     }) {
