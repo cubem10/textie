@@ -72,6 +72,9 @@
         }
       }
     },
+    "COMMENTS_TITLE" : {
+
+    },
     "CONFIRM" : {
       "localizations" : {
         "en" : {
@@ -267,6 +270,9 @@
           }
         }
       }
+    },
+    "LEAVE_FIRST_COMMENT" : {
+
     },
     "LOADING_MESSAGE" : {
       "localizations" : {
@@ -513,6 +519,9 @@
           }
         }
       }
+    },
+    "POST_DETAIL_VIEW_TITLE" : {
+
     },
     "POST_LOADING_MESSAGE" : {
       "localizations" : {

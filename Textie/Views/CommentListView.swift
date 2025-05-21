@@ -19,17 +19,43 @@ struct CommentListView: View {
     
     var body: some View {
         @Bindable var viewModel: CommentListViewModel = viewModel
-        VStack {
-            Text("COMMENTS")
-                .font(.title)
-                .fontWeight(.bold)
-            Divider()
+        VStack(alignment: .leading) {
+            HStack {
+                TextField("", text: $newComment)
+                    .padding(8)
+                    .foregroundStyle(colorScheme == .dark ? .white : .black)
+                    .background {
+                    if newComment.count == 0 {
+                        HStack {
+                            Text("COMMENT_WRITE_PLACEHOLDER")
+                                .padding(.horizontal, 8)
+                            Spacer()
+                        }
+                    }
+                }
+                Button(action: {
+                    Task {
+                        await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
+                        await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+                        newComment = ""
+                    }
+                }) {
+                    Image(systemName: "paperplane.fill").padding(.horizontal, 8)
+                }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 8).strokeBorder(colorScheme == .dark ? Color.white : Color.gray.opacity(0.7), lineWidth: 1)
+            }
             Group {
                 if viewModel.isLoading {
                     ProgressView("LOADING_MESSAGE")
                 }
                 else if viewModel.comments.isEmpty {
                     Text("NO_COMMENTS_MESSAGE")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("LEAVE_FIRST_COMMENT")
+                        .font(.subheadline)
                 }
                 else {
                     List(viewModel.comments) { commentData in
@@ -42,33 +68,6 @@ struct CommentListView: View {
                         }
                     }
                     .listStyle(.plain)
-                }
-                Spacer()
-                HStack {
-                    TextField("", text: $newComment)
-                        .padding(8)
-                        .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        .background {
-                        if newComment.count == 0 {
-                            HStack {
-                                Text("COMMENT_WRITE_PLACEHOLDER")
-                                    .padding(.horizontal, 8)
-                                Spacer()
-                            }
-                        }
-                    }
-                    Button(action: {
-                        Task {
-                            await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
-                            await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
-                            newComment = ""
-                        }
-                    }) {
-                        Image(systemName: "paperplane.fill").padding(.horizontal, 8)
-                    }
-                }
-                .overlay {
-                    Capsule().fill(.clear).strokeBorder(colorScheme == .dark ? Color.white : Color.gray.opacity(0.7), lineWidth: 1)
                 }
             }
         }
@@ -84,5 +83,5 @@ struct CommentListView: View {
 }
 
 #Preview {
-    CommentListView(postId: UUID(uuidString: "a2e667da-deab-4e45-844b-61fd4cc5f6a1")!).environment(UserStateViewModel())
+    CommentListView(postId: UUID(uuidString: "c893eccc-5535-48af-9d52-2ee9259bf8c8")!).environment(UserStateViewModel())
 }

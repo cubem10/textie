@@ -16,36 +16,39 @@ struct PostListView: View {
     
     var body: some View {
         @Bindable var viewModel: PostListViewModel = viewModel
-        VStack(alignment: .leading) {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView("POST_LOADING_MESSAGE")
-                } else if viewModel.postDatas.isEmpty {
-                    Text("NO_POST_MESSAGE")
-                    Spacer()
-                }
-                else {
-                    HStack {
-                        Text("POST_TITLE")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        Spacer()
+        Group {
+            if viewModel.isLoading {
+                ProgressView("POST_LOADING_MESSAGE")
+            } else if viewModel.postDatas.isEmpty {
+                Text("NO_POST_MESSAGE")
+            }
+            else {
+                NavigationStack {
+                    VStack(alignment: .leading ){
+                        HStack {
+                            Text("POST_TITLE")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .padding()
+                            Spacer()
+                        }
+                        
+                        List(viewModel.postDatas) { postData in
+                            PostElementView(postData: postData)
+                                .padding(.bottom)
+                                .task {
+                                    await viewModel.loadMorePost(id: postData.id)
+                                }
+                                .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                                .background(
+                                    NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
+                                )
+                        }.listStyle(.plain)
                     }
-                    
-                    List(viewModel.postDatas) { postData in
-                        PostElementView(postData: postData)
-                            .padding()
-                            .listRowInsets(EdgeInsets())
-                            .task {
-                                await viewModel.loadMorePost(id: postData.id)
-                            }
-                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
-                    }.listStyle(.plain)
-                }
-                Spacer()
+                }.navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
+                    .navigationBarTitleDisplayMode(.inline)
             }
         }
-        .padding()
         .task {
             await viewModel.loadInitialPost(token: userStateViewModel.token)
         }
