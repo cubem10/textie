@@ -8,23 +8,20 @@
 import SwiftUI
 
 struct PostListView: View {
-    @State private var viewModel: PostListViewModel = .init(offset: 0, limit: 10)
+    @State private var viewModel: PostListViewModel = .init()
     @Environment(UserStateViewModel.self) var userStateViewModel
-    
-    private var offset: Int = 0
-    private let limit: Int = 10
     
     var body: some View {
         @Bindable var viewModel: PostListViewModel = viewModel
         Group {
-            if viewModel.isLoading {
+            if viewModel.isInitialLoading {
                 ProgressView("POST_LOADING_MESSAGE")
             } else if viewModel.postDatas.isEmpty {
                 Text("NO_POST_MESSAGE")
             }
             else {
                 NavigationStack {
-                    VStack(alignment: .leading ){
+                    VStack(alignment: .leading){
                         HStack {
                             Text("POST_TITLE")
                                 .font(.title)
@@ -37,24 +34,25 @@ struct PostListView: View {
                             PostElementView(postData: postData)
                                 .padding(.bottom)
                                 .task {
-                                    await viewModel.loadMorePost(id: postData.id)
+                                    await viewModel.loadMoreIfNeeded(currentItemID: postData.id)
                                 }
                                 .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                                 .background(
                                     NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
                                 )
                         }.listStyle(.plain)
+                        
                     }
                 }.navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
                     .navigationBarTitleDisplayMode(.inline)
             }
         }
         .task {
-            await viewModel.loadInitialPost(token: userStateViewModel.token)
+            await viewModel.loadInitialPosts(token: userStateViewModel.token)
         }
         .refreshable {
             Task {
-                await viewModel.loadInitialPost(token: userStateViewModel.token)
+                await viewModel.loadInitialPosts(token: userStateViewModel.token)
             }
         }
         .alert("NETWORK_ERROR", isPresented: $viewModel.showFailAlert, actions: { }, message: {

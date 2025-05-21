@@ -12,63 +12,66 @@ import os
 class PostListViewModel {
     private let logger = Logger()
     
-    var isLoading = false
+    var isInitialLoading: Bool = false
+    var isLoadingMore: Bool = false
+    private let paginator: PaginationActor = .init(limit: 10)
     
     var postDatas: [PostData] = []
     var token: String = ""
-    var offset: Int = 0
-    var limit: Int = 10
     
     var showFailAlert: Bool = false
     var failDetail: String = ""
     
-    init(offset: Int, limit: Int) {
-        self.postDatas = []
-    }
-    
-    func loadMorePost(id: UUID) async {
-        if id == postDatas.last?.id {
-            await loadPost(token: token)
-        }
-    }
-    
-    func loadPost(token: String) async {
-        var buffer: [PostData] = []
-        do {
-            let (postResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
-            
-            let decodedPostResponse: [PostDataDTO] = try JSONDecoder().decode([PostDataDTO].self, from: postResponseData)
-                    
-            for postDataDTO in decodedPostResponse {
-                let (likeResponseData, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET")
-                
-                let decodedLikesResponse: LikeDataDTO = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponseData)
-                
-                try await buffer.append(PostData.construct(post: postDataDTO, likes: decodedLikesResponse.likeCount, token: token))
-            }
-        } catch {
-            if (error as? URLError) != nil {
-                failDetail = error.localizedDescription
-                showFailAlert = true
-            }
-        }
-        
-        buffer = buffer.filter { newItem in !postDatas.contains(where: { post in post.id == newItem.id}) }
-        
-        postDatas = postDatas + buffer
-    }
-    
-    func loadInitialPost(token: String) async {
+    func loadInitialPosts(token: String) async {
         self.token = token
         
-        guard !isLoading else { return }
-
-        postDatas.removeAll()
+        guard await paginator.beginInitialLoad() else { return }
+        isInitialLoading = true
+        defer { isInitialLoading = false}
         
-        isLoading = true
-        defer { isLoading = false }
-        offset = 0
-        
-        await loadPost(token: token)
+        do {
+            let newPosts = try await loadPosts(offset: 0)
+            postDatas.append(contentsOf: newPosts)
+            await paginator.finishLoading(newCount: newPosts.count)
+        } catch {
+            print("loadInitialPosts error: \(error)")
+            failDetail = error.localizedDescription
+            showFailAlert = true
+            await paginator.finishLoading(newCount: 0)
+        }
     }
+    
+    func loadMoreIfNeeded(currentItemID id: UUID) async {
+        guard id == postDatas.last?.id else { return }
+        guard let nextOffset = await paginator.beginLoadMore() else { return }
+        
+        isLoadingMore = true
+        defer { isLoadingMore = false }
+        
+        do {
+            let newPosts = try await loadPosts(offset: nextOffset)
+            postDatas.append(contentsOf: newPosts)
+            await paginator.finishLoading(newCount: newPosts.count)
+        } catch {
+            print("loadMoreIfNeeded error: \(error)")
+            failDetail = error.localizedDescription
+            showFailAlert = true
+            await paginator.finishLoading(newCount: 0)
+        }
+    }
+    
+    private func loadPosts(offset: Int, limit: Int = 10) async throws -> [PostData] {
+        var posts: [PostData] = []
+        
+        let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
+        let decodedResponse = try JSONDecoder().decode([PostDataDTO].self, from: response)
+        for postData in decodedResponse {
+            let (likeResponse, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/count/", httpMethod: "GET")
+            let decodedLikeResponse = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponse)
+            try await posts.append(PostData.construct(post: postData, likes: decodedLikeResponse.likeCount, token: token))
+        }
+        
+        return posts
+    }
+    
 }
