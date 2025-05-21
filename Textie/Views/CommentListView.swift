@@ -12,7 +12,7 @@ struct CommentListView: View {
     var postId: UUID
     var logger = Logger()
     
-    @State var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
+    @State var viewModel: CommentListViewModel = .init()
     @State var newComment: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -20,6 +20,27 @@ struct CommentListView: View {
     var body: some View {
         @Bindable var viewModel: CommentListViewModel = viewModel
         VStack(alignment: .leading) {
+            if !viewModel.isLoading {
+                HStack {
+                    Button(action: {
+                        viewModel.page = viewModel.page - 1
+                        Task {
+                            await viewModel.loadComments(token: userStateViewModel.token, postId: postId)
+                        }
+                    }) {
+                        Text("PREVIOUS_PAGE")
+                    }.disabled(viewModel.page == 0)
+                    Spacer()
+                    Button(action: {
+                        viewModel.page = viewModel.page + 1
+                        Task {
+                            await viewModel.loadComments(token: userStateViewModel.token, postId: postId)
+                        }
+                    }) {
+                        Text("NEXT_PAGE")
+                    }.disabled(viewModel.isLastPage)
+                }.padding()
+            }
             HStack {
                 TextField("", text: $newComment)
                     .padding(8)
@@ -36,7 +57,7 @@ struct CommentListView: View {
                 Button(action: {
                     Task {
                         await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
-                        await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+                        await viewModel.loadComments(token: userStateViewModel.token, postId: postId)
                         newComment = ""
                     }
                 }) {
@@ -66,9 +87,6 @@ struct CommentListView: View {
                                 .listRowInsets(EdgeInsets())
                                 .padding(.vertical)
                                 .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
-                                .task {
-                                    await viewModel.loadMoreComments(id: commentData.id)
-                                }
                                 Spacer()
                             }
                             Divider()
@@ -78,7 +96,7 @@ struct CommentListView: View {
             }
         }
         .task {
-            await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+            await viewModel.loadComments(token: userStateViewModel.token, postId: postId)
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert) {
             Button("CONFIRM") { }
