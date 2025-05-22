@@ -29,6 +29,8 @@ class PostListViewModel {
         isInitialLoading = true
         defer { isInitialLoading = false}
         
+        postDatas.removeAll()
+        
         do {
             let newPosts = try await loadPosts(offset: 0)
             postDatas.append(contentsOf: newPosts)
@@ -49,8 +51,12 @@ class PostListViewModel {
         
         do {
             let newPosts = try await loadPosts(offset: nextOffset)
-            postDatas.append(contentsOf: newPosts)
-            await paginator.finishLoading(newCount: newPosts.count)
+            let existingIDs = Set(postDatas.map { $0.id })
+            let uniquePosts = newPosts.filter { !existingIDs.contains($0.id) }
+            if !uniquePosts.isEmpty {
+                postDatas.append(contentsOf: uniquePosts)
+            }
+            await paginator.finishLoading(newCount: uniquePosts.count)
         } catch {
             failDetail = error.localizedDescription
             showFailAlert = true
@@ -66,6 +72,7 @@ class PostListViewModel {
         for postData in decodedResponse {
             let (likeResponse, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/count/", httpMethod: "GET")
             let decodedLikeResponse = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponse)
+            
             try await posts.append(PostData.construct(post: postData, likes: decodedLikeResponse.likeCount, token: token))
         }
         

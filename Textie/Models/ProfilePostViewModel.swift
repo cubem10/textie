@@ -31,6 +31,8 @@ class ProfilePostViewModel {
         isInitialLoading = true
         defer { isInitialLoading = false }
         
+        posts.removeAll()
+        
         do {
             let newPosts = try await fetchPosts(offset: 0, limit: 10)
             posts.append(contentsOf: newPosts)
@@ -51,8 +53,12 @@ class ProfilePostViewModel {
         
         do {
             let newPosts = try await fetchPosts(offset: nextOffset, limit: 10)
-            posts.append(contentsOf: newPosts)
-            await pagination.finishLoading(newCount: newPosts.count)
+            let existingIDs = Set(posts.map { $0.id })
+            let uniquePosts = newPosts.filter { !existingIDs.contains($0.id) }
+            if !uniquePosts.isEmpty {
+                posts.append(contentsOf: uniquePosts)
+            }
+            await pagination.finishLoading(newCount: uniquePosts.count)
         } catch {
             errorDetails = error.localizedDescription
             showError = true

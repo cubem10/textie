@@ -19,7 +19,7 @@ struct CommentListView: View {
     
     var body: some View {
         @Bindable var viewModel: CommentListViewModel = viewModel
-        VStack(alignment: .leading) {
+        VStack() {
             HStack {
                 TextField("", text: $newComment)
                     .padding(8)
@@ -49,13 +49,16 @@ struct CommentListView: View {
             Group {
                 if viewModel.isInitialLoading {
                     ProgressView("LOADING_MESSAGE")
+                        .padding()
                 }
                 else if viewModel.comments.isEmpty {
                     Text("NO_COMMENTS_MESSAGE")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .padding(.top)
                     Text("LEAVE_FIRST_COMMENT")
                         .font(.subheadline)
+                        .padding(.bottom)
                 }
                 else {
                     ScrollView {

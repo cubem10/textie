@@ -31,6 +31,8 @@ class CommentListViewModel {
         isInitialLoading = true
         defer { isInitialLoading = false }
         
+        comments.removeAll()
+        
         do {
             let newComments = try await fetchComments(offset: 0, limit: 10)
             comments.append(contentsOf: newComments)
@@ -51,8 +53,12 @@ class CommentListViewModel {
         
         do {
             let newPosts = try await fetchComments(offset: nextOffset, limit: 10)
-            comments.append(contentsOf: newPosts)
-            await pagination.finishLoading(newCount: newPosts.count)
+            let existingIDs = Set(comments.map { $0.id })
+            let uniquePosts = newPosts.filter { !existingIDs.contains($0.id) }
+            if !uniquePosts.isEmpty {
+                comments.append(contentsOf: uniquePosts)
+            }
+            await pagination.finishLoading(newCount: uniquePosts.count)
         } catch {
             errorDetails = error.localizedDescription
             showError = true
