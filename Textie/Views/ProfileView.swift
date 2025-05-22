@@ -12,70 +12,97 @@ struct ProfileView: View {
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
     @State private var viewModel: ProfileViewModel = .init()
+    @State var postViewModel: ProfilePostViewModel = .init()
     @State private var editingProfile: Bool = false
     var uuid: UUID
     private let logger = Logger()
     
     var body: some View {
         let isMyProfile: Bool = uuid == userStateViewModel.uuid
-        VStack(alignment: .leading) {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView("PROFILE_LOADING_MESSAGE")
-                }
-                else {
-                    HStack {
-                        ProfileImageView()
-                        .frame(width: 100, height: 100)
-                        .padding(.trailing)
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text(viewModel.nickname)
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                            }
-                            Button(action: {
-                                UIPasteboard.general.string = "@" + viewModel.username
-                            }) {
+        NavigationStack {
+            VStack() {
+                Group {
+                    if viewModel.isLoading {
+                        ProgressView("PROFILE_LOADING_MESSAGE")
+                    }
+                    else {
+                        HStack {
+                            ProfileImageView()
+                            .frame(width: 100, height: 100)
+                            .padding(.trailing)
+                            VStack(alignment: .leading) {
                                 HStack {
-                                    Text("@" + viewModel.username)
-                                        .font(.subheadline)
-                                    Image(systemName: "document.on.document.fill").scaleEffect(0.7)
+                                    Text(viewModel.nickname)
+                                        .font(.title)
+                                        .fontWeight(.bold)
                                 }
-                            }.foregroundStyle(colorScheme == .dark ? .white : .black)
-                            if isMyProfile {
-                                HStack {
-                                    Button(action: {
-                                        editingProfile.toggle()
-                                    }) {
-                                        Text("EDIT_PROFILE")
-                                    }.padding(.trailing)
-                                    Button(action: {
-                                        Task {
-                                            let logoutStatus: Bool = await userStateViewModel.logout()
-                                            logger.debug("logoutStatus: \(logoutStatus)")
-                                        }
-                                    }) {
-                                        Text("LOGOUT")
+                                Button(action: {
+                                    UIPasteboard.general.string = "@" + viewModel.username
+                                }) {
+                                    HStack {
+                                        Text("@" + viewModel.username)
+                                            .font(.subheadline)
+                                        Image(systemName: "document.on.document.fill").scaleEffect(0.7)
                                     }
+                                }.foregroundStyle(colorScheme == .dark ? .white : .black)
+                                if isMyProfile {
+                                    HStack {
+                                        Button(action: {
+                                            editingProfile.toggle()
+                                        }) {
+                                            Text("EDIT_PROFILE")
+                                        }.padding(.trailing)
+                                        Button(action: {
+                                            Task {
+                                                let logoutStatus: Bool = await userStateViewModel.logout()
+                                                logger.debug("logoutStatus: \(logoutStatus)")
+                                            }
+                                        }) {
+                                            Text("LOGOUT")
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer()
+                        }
+                        .frame(height: 100)
+                        .padding()
+                        Divider()
+                        HStack {
+                            Group {
+                                if postViewModel.isInitialLoading {
+                                    ProgressView("POST_LOADING_MESSAGE")
+                                }
+                                else if postViewModel.posts.isEmpty {
+                                    Text("NO_POST_MESSAGE")
+                                }
+                                else {
+                                    List(postViewModel.posts) { postData in
+                                        PostElementView(postData: postData)
+                                            .padding(.bottom)
+                                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                                            .background(
+                                                NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
+                                            )
+                                            .task(id: postData.id) {
+                                                await postViewModel.loadMoreIfNeeded(id: postData.id)
+                                            }
+                                    }.listStyle(.plain)
                                 }
                             }
                         }
                     }
-                    .frame(height: 100)
-                    .padding(.bottom)
-                    Divider()
-                    ProfilePostView(token: userStateViewModel.token, uuid: userStateViewModel.uuid)
                 }
             }
+            Spacer()
         }
         .task {
             await viewModel.loadUser(token: userStateViewModel.token, uuid: uuid)
+            await postViewModel.loadInitialPosts(token: userStateViewModel.token, uuid: uuid)
         }
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)
         }
-        .padding()
     }
 }
 
