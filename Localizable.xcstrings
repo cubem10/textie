@@ -55,8 +55,7 @@
         }
       }
     },
-    "COMMENTS" : {
-      "extractionState" : "manual",
+    "COMMENTS_TITLE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,9 +70,6 @@
           }
         }
       }
-    },
-    "COMMENTS_TITLE" : {
-
     },
     "CONFIRM" : {
       "localizations" : {
@@ -272,7 +268,20 @@
       }
     },
     "LEAVE_FIRST_COMMENT" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave the first comment"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 번째 댓글을 남겨보세요"
+          }
+        }
+      }
     },
     "LOADING_MESSAGE" : {
       "localizations" : {
@@ -521,7 +530,20 @@
       }
     },
     "POST_DETAIL_VIEW_TITLE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Details"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "게시글 상세"
+          }
+        }
+      }
     },
     "POST_LOADING_MESSAGE" : {
       "localizations" : {

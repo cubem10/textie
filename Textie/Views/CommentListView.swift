@@ -12,7 +12,7 @@ struct CommentListView: View {
     var postId: UUID
     var logger = Logger()
     
-    @State var viewModel: CommentListViewModel = .init(offset: 0, limit: 10)
+    @State var viewModel: CommentListViewModel = .init()
     @State var newComment: String = ""
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -47,7 +47,7 @@ struct CommentListView: View {
                 RoundedRectangle(cornerRadius: 8).strokeBorder(colorScheme == .dark ? Color.white : Color.gray.opacity(0.7), lineWidth: 1)
             }
             Group {
-                if viewModel.isLoading {
+                if viewModel.isInitialLoading {
                     ProgressView("LOADING_MESSAGE")
                 }
                 else if viewModel.comments.isEmpty {
@@ -67,7 +67,7 @@ struct CommentListView: View {
                                 .padding(.vertical)
                                 .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                                 .task {
-                                    await viewModel.loadMoreComments(id: commentData.id)
+                                    await viewModel.loadMoreIfNeeded(id: commentData.id)
                                 }
                                 Spacer()
                             }
@@ -80,10 +80,10 @@ struct CommentListView: View {
         .task {
             await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
         }
-        .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert) {
+        .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showError) {
             Button("CONFIRM") { }
         } message: {
-            Text(viewModel.failDetail)
+            Text(viewModel.errorDetails)
         }
     }
 }

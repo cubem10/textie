@@ -6,92 +6,88 @@
 //
 
 import Foundation
-import os
 
 @Observable
 class CommentListViewModel {
-    var isLoading: Bool = false
-    var isMoreLoading: Bool = false
+    private var pagination: PaginationActor = .init(limit: 10)
     
-    private var offset: Int = 0
-    private var limit: Int = 10
+    var isInitialLoading: Bool = false
+    var isLoadingMore: Bool = false
     
-    private var postId: UUID = UUID()
-    private var token: String = ""
+    var showError: Bool = false
+    var errorDetails: String = ""
     
-    private var logger = Logger()
-    
-    var showFailAlert: Bool = false
-    var failDetail: String = ""
+    var token: String = ""
+    var uuid: UUID = UUID()
     
     var comments: [CommentData] = []
     
-    init(offset: Int, limit: Int) {
-        self.offset = offset
-        self.limit = limit
-    }
-    
-    @MainActor
     func loadInitialComments(postId: UUID, token: String) async {
-        self.postId = postId
         self.token = token
+        self.uuid = postId
         
-        comments.removeAll()
-        offset = 0
+        guard await pagination.beginInitialLoad() else { return }
         
-        isLoading = true
-        defer { isLoading = false }
-        
-        await loadComments()
-    }
-    
-    @MainActor
-    func loadMoreComments(id: UUID) async {
-        if comments.last?.id != id {
-            return
-        }
-        
-        isMoreLoading = true
-        defer { isMoreLoading = false }
-        
-        await loadComments()
-    }
-    
-    func loadComments() async {
-        var buffer: [CommentData] = []
+        isInitialLoading = true
+        defer { isInitialLoading = false }
         
         do {
-            let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET")
-            
-            let decodedComments: CommentResponseDTO = try JSONDecoder().decode(CommentResponseDTO.self, from: response)
-            
-            for comment in decodedComments.comments {
-                try await buffer.append(CommentData.construct(comment: comment, token: token))
-            }
-            
-            offset += limit
-            
-            buffer = buffer.filter { newComment in !comments.contains(where: { comment in
-                comment.id == newComment.id
-            })}
-            
-            comments.append(contentsOf: buffer)
+            let newComments = try await fetchComments(offset: 0, limit: 10)
+            comments.append(contentsOf: newComments)
+            await pagination.finishLoading(newCount: newComments.count)
         } catch {
-            if (error as? URLError) != nil {
-                failDetail = error.localizedDescription
-                showFailAlert = true
-            }
+            errorDetails = error.localizedDescription
+            showError = true
+            print("loadInitialComments error: \(errorDetails)")
+            await pagination.finishLoading(newCount: 0)
         }
     }
-
+    
+    func loadMoreIfNeeded(id: UUID) async {
+        guard id == comments.last?.id else { return }
+        guard let nextOffset = await pagination.beginLoadMore() else { return }
+        
+        isLoadingMore = true
+        defer { isLoadingMore = false }
+        
+        do {
+            let newPosts = try await fetchComments(offset: nextOffset, limit: 10)
+            comments.append(contentsOf: newPosts)
+            await pagination.finishLoading(newCount: newPosts.count)
+        } catch {
+            errorDetails = error.localizedDescription
+            showError = true
+            print("loadMoreIfNeeded error: \(errorDetails)")
+            await pagination.finishLoading(newCount: 0)
+        }
+    }
+    
     func addComment(postId: UUID, newComment: String, token: String) async {
         do {
             let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postId)/comments/?content=\(newComment)", httpMethod: "POST", withToken: token)
         } catch {
             if (error as? URLError) != nil {
-                failDetail = error.localizedDescription
-                showFailAlert = true
+                errorDetails = error.localizedDescription
+                showError = true
             }
         }
+    }
+    
+    private func fetchComments(offset: Int, limit: Int) async throws -> [CommentData] {
+        var comments: [CommentData] = []
+        
+        let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(uuid)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
+        
+        print(serverURLString + "/posts/\(uuid)/comments/?offset=\(offset)&limit=\(limit)" + " -> \(String(data: response, encoding: .utf8) ?? "")")
+        
+        let decodedResponse = try JSONDecoder().decode(CommentResponseDTO.self, from: response)
+        
+        print("decodedResponse: \(decodedResponse)")
+        
+        for comment in decodedResponse.comments {
+            try await comments.append(CommentData.construct(comment: comment, token: token))
+        }
+        
+        return comments
     }
 }
