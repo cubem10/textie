@@ -38,7 +38,6 @@ class ProfilePostViewModel {
         } catch {
             errorDetails = error.localizedDescription
             showError = true
-            print("loadInitialPosts error: \(errorDetails)")
             await pagination.finishLoading(newCount: 0)
         }
     }
@@ -57,7 +56,6 @@ class ProfilePostViewModel {
         } catch {
             errorDetails = error.localizedDescription
             showError = true
-            print("loadMoreIfNeeded error: \(errorDetails)")
             await pagination.finishLoading(newCount: 0)
         }
     }
@@ -67,9 +65,7 @@ class ProfilePostViewModel {
         
         let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/users/\(uuid)/posts/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
         let decodedResponse = try JSONDecoder().decode([PostDataDTO].self, from: response)
-        
-        print("decodedResponse: \(decodedResponse)")
-        
+                
         for postDataDTO in decodedResponse {
             let (likeResponse, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postDataDTO.id)/likes/count", httpMethod: "GET")
             let decodedLikeResponse = try JSONDecoder().decode(LikeDataDTO.self, from: likeResponse)

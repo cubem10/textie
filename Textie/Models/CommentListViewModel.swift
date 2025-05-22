@@ -38,7 +38,6 @@ class CommentListViewModel {
         } catch {
             errorDetails = error.localizedDescription
             showError = true
-            print("loadInitialComments error: \(errorDetails)")
             await pagination.finishLoading(newCount: 0)
         }
     }
@@ -57,7 +56,6 @@ class CommentListViewModel {
         } catch {
             errorDetails = error.localizedDescription
             showError = true
-            print("loadMoreIfNeeded error: \(errorDetails)")
             await pagination.finishLoading(newCount: 0)
         }
     }
@@ -78,11 +76,7 @@ class CommentListViewModel {
         
         let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(uuid)/comments/?offset=\(offset)&limit=\(limit)", httpMethod: "GET", withToken: token)
         
-        print(serverURLString + "/posts/\(uuid)/comments/?offset=\(offset)&limit=\(limit)" + " -> \(String(data: response, encoding: .utf8) ?? "")")
-        
         let decodedResponse = try JSONDecoder().decode(CommentResponseDTO.self, from: response)
-        
-        print("decodedResponse: \(decodedResponse)")
         
         for comment in decodedResponse.comments {
             try await comments.append(CommentData.construct(comment: comment, token: token))

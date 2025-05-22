@@ -34,7 +34,6 @@ class PostListViewModel {
             postDatas.append(contentsOf: newPosts)
             await paginator.finishLoading(newCount: newPosts.count)
         } catch {
-            print("loadInitialPosts error: \(error)")
             failDetail = error.localizedDescription
             showFailAlert = true
             await paginator.finishLoading(newCount: 0)
@@ -53,7 +52,6 @@ class PostListViewModel {
             postDatas.append(contentsOf: newPosts)
             await paginator.finishLoading(newCount: newPosts.count)
         } catch {
-            print("loadMoreIfNeeded error: \(error)")
             failDetail = error.localizedDescription
             showFailAlert = true
             await paginator.finishLoading(newCount: 0)
