@@ -106,7 +106,7 @@ struct ProfileView: View {
             ProfileEditView(newNickname: viewModel.nickname)
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert, actions: {
-            Button("DISMISS") {
+            Button("CONFIRM") {
                 
             }
         }, message: {

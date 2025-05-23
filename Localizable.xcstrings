@@ -135,9 +135,6 @@
         }
       }
     },
-    "DISMISS" : {
-
-    },
     "EDIT_DONE" : {
       "localizations" : {
         "en" : {
@@ -532,23 +529,6 @@
         }
       }
     },
-    "POST_DETAIL_VIEW_TITLE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Post Details"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "게시글 상세"
-          }
-        }
-      }
-    },
     "POST_LOADING_MESSAGE" : {
       "localizations" : {
         "en" : {
@@ -840,10 +820,36 @@
       }
     },
     "SEE_LESS" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Less"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "덜 보기"
+          }
+        }
+      }
     },
     "SEE_MORE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See More"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "더 보기"
+          }
+        }
+      }
     },
     "SELF_LIKE_NOT_AVAILABLE" : {
       "localizations" : {
