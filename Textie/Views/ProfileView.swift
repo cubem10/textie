@@ -18,6 +18,8 @@ struct ProfileView: View {
     private let logger = Logger()
     
     var body: some View {
+        @Bindable var viewModel: ProfileViewModel = viewModel
+        
         let isMyProfile: Bool = uuid == userStateViewModel.uuid
         VStack() {
             Group {
@@ -103,6 +105,13 @@ struct ProfileView: View {
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)
         }
+        .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert, actions: {
+            Button("DISMISS") {
+                
+            }
+        }, message: {
+            Text(viewModel.failDetail)
+        })
     }
 }
 

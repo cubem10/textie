@@ -135,6 +135,9 @@
         }
       }
     },
+    "DISMISS" : {
+
+    },
     "EDIT_DONE" : {
       "localizations" : {
         "en" : {

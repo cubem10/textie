@@ -28,9 +28,7 @@ class ProfileViewModel {
         do {
             let (response, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user/\(uuid)", httpMethod: "GET", withToken: token)
             
-            guard let decodedResponse: UserProfileDTO = try? JSONDecoder().decode(UserProfileDTO.self, from: response) else {
-                return
-            }
+            let decodedResponse: UserProfileDTO = try JSONDecoder().decode(UserProfileDTO.self, from: response)
             
             username = decodedResponse.username
             nickname = decodedResponse.nickname
