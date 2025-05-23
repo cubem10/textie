@@ -48,6 +48,7 @@ struct PostElementView: View {
         
         do {
             let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
+            onPostDeleted()
         } catch {
             if (error as? URLError) != nil {
                 alertCause = .showError(error.localizedDescription)
