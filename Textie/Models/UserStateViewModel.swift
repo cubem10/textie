@@ -24,15 +24,11 @@ class UserStateViewModel {
     init() {
         Task {
             do {
-                uuid = try await getUUID()
-                guard let accessToken = getTokenFromKeychain(key: "access_token") else {
-                    throw BackendError.invalidCredential
-                }
-                token = accessToken
                 let refreshResult: Bool = await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
                 }
+                uuid = try await getUUID()
             } catch {
                 logger.debug("An error occurred while initializing the app: \(error), access token found: \(self.token != "")")
             }
@@ -116,14 +112,12 @@ class UserStateViewModel {
         isLoading = true
         defer { isLoading = false }
         
-        guard let refreshToken: String = getTokenFromKeychain(key: "refresh_token") else {
+        guard let refreshedToken: String = getTokenFromKeychain(key: "refresh_token") else {
             return false
         }
         
-        token = refreshToken
-        
         do {
-            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshToken)", httpMethod: "POST")
+            let (data, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/refresh-token?refresh_token=\(refreshedToken)", httpMethod: "POST")
             return parseTokenResponse(encodedResponse: data)
         } catch {
             failDetail = error.localizedDescription
