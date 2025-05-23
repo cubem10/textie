@@ -31,6 +31,7 @@ struct MainView: View {
             
         }
         .onAppear {
+            selection = 0
             timer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { _ in
                 Task {
                     let result = await viewModel.refreshSession()

@@ -24,6 +24,8 @@ class UserStateViewModel {
     init() {
         Task {
             do {
+                isRetrievingUUID = true
+                defer { isRetrievingUUID = false }
                 let refreshResult: Bool = await refreshSession()
                 if refreshResult {
                     isLoggedIn = true
@@ -151,9 +153,6 @@ class UserStateViewModel {
     
     @MainActor
     func getUUID() async throws -> UUID {
-        isRetrievingUUID = true
-        defer { isRetrievingUUID = false }
-        
         guard let accessToken = getTokenFromKeychain(key: "access_token") else {
             throw BackendError.invalidCredential
         }
