@@ -21,7 +21,7 @@ struct ProfileView: View {
         @Bindable var viewModel: ProfileViewModel = viewModel
         
         let isMyProfile: Bool = uuid == userStateViewModel.uuid
-        VStack() {
+        VStack {
             Group {
                 if viewModel.isLoading {
                     ProgressView("PROFILE_LOADING_MESSAGE")
@@ -99,15 +99,19 @@ struct ProfileView: View {
                     }
                 }
             }
+            Spacer()
         }
-        Spacer()
-    
         .task {
             await viewModel.loadUser(token: userStateViewModel.token, uuid: uuid)
             await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
         }
         .sheet(isPresented: $editingProfile) {
-            ProfileEditView(newNickname: viewModel.nickname, profileViewModel: viewModel)
+            ProfileEditView(newNickname: viewModel.nickname, onNicknameEdit: {
+                Task {
+                    await viewModel.loadUser(token: userStateViewModel.token, uuid: uuid)
+                    await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
+                }
+            })
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert, actions: {
             Button("CONFIRM") {

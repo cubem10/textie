@@ -15,7 +15,7 @@ struct ProfileEditView: View {
     @State var showErrorAlert: Bool = false
     @State var errorMessage: String = ""
     
-    @State var profileViewModel: ProfileViewModel
+    var onNicknameEdit: () -> Void
     
     var logger = Logger()
     
@@ -30,7 +30,7 @@ struct ProfileEditView: View {
                         }
                         do {
                             let (_, _): (Data, URLResponse) = try await sendRequestToServer(toEndpoint: serverURLString + "/user?nickname=\(newNickname)", httpMethod: "PATCH", withToken: viewModel.token)
-                            await profileViewModel.loadUser(token: viewModel.token, uuid: viewModel.uuid)
+                            onNicknameEdit()
                         } catch {
                             if (error as? URLError) != nil {
                                 errorMessage = error.localizedDescription
@@ -60,5 +60,5 @@ struct ProfileEditView: View {
 }
 
 #Preview {
-    ProfileEditView(newNickname: "Nick Name", profileViewModel: ProfileViewModel()).environment(UserStateViewModel())
+    ProfileEditView(newNickname: "Nick Name", onNicknameEdit: { }).environment(UserStateViewModel())
 }
