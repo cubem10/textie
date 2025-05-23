@@ -83,6 +83,10 @@ struct ProfileView: View {
                                         Task {
                                             await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
                                         }
+                                    }, onPostEdited: {
+                                        Task {
+                                            await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
+                                        }
                                     })
                                         .padding(.bottom)
                                         .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })

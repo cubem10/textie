@@ -13,13 +13,14 @@ struct PostElementView: View {
     @State private var showComment: Bool = false
     @State private var commentDatas: [CommentData] = []
     @State private var showDialog: Bool = false
-    @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
     @State private var alertCause: AlertCause? = nil
     @State private var showMore: Bool = false
     @State private var isLoading: Bool = false
+    @State private var editData: PostData? = nil
     
     let onPostDeleted: () -> Void
+    let onPostEdited: () -> Void
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
@@ -157,7 +158,7 @@ struct PostElementView: View {
                 }
                 .confirmationDialog("POST_MENU", isPresented: $showDialog) {
                     Button(action: {
-                        showEditView.toggle()
+                        editData = postData
                     }) {
                         Text("EDIT_POST")
                     }
@@ -185,9 +186,9 @@ struct PostElementView: View {
                 ProfileView(uuid: postData.userId)
             }.padding()
         }
-        .sheet(isPresented: $showEditView) {
+        .sheet(item: $editData, onDismiss: onPostEdited, content: { postData in
             PostWriteView(title: postData.title, context: postData.content, postId: postData.id, selectedTab: .constant(0))
-        }
+        })
         .sheet(isPresented: $showComment) {
             HStack(alignment: .center) {
                 Image(systemName: "bubble")
@@ -224,5 +225,5 @@ struct PostElementView: View {
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, isLiked: true, content: "Post content goes here. ", likes: 1234567890), onPostDeleted: { }).environment(UserStateViewModel())
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, isLiked: true, content: "Post content goes here. ", likes: 1234567890), onPostDeleted: { }, onPostEdited: { }).environment(UserStateViewModel())
 }

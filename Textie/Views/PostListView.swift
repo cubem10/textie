@@ -34,6 +34,10 @@ struct PostListView: View {
                             Task {
                                 await viewModel.loadInitialDatas(id: nil, token: userStateViewModel.token)
                             }
+                        }, onPostEdited: {
+                            Task {
+                                await viewModel.loadInitialDatas(id: nil, token: userStateViewModel.token)
+                            }
                         })
                             .padding(.bottom)
                             .task {
