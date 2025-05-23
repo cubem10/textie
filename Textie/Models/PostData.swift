@@ -29,7 +29,7 @@ struct PostDataDTO: Identifiable, Decodable {
     }
 }
 
-struct PostData: Identifiable, Hashable, Decodable {
+struct PostData: Model, Hashable {
     let id: UUID
     let name: String
     let title: String
@@ -111,7 +111,7 @@ struct CommentDataDTO: Identifiable, Decodable {
 }
 
 
-struct CommentData: Identifiable, Decodable {
+struct CommentData: Model {
     let id: UUID
     let name: String
     let createdAt: Date

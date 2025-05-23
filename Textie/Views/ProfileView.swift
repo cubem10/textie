@@ -73,11 +73,11 @@ struct ProfileView: View {
                                 if postViewModel.isInitialLoading {
                                     ProgressView("POST_LOADING_MESSAGE")
                                 }
-                                else if postViewModel.posts.isEmpty {
+                                else if postViewModel.datas.isEmpty {
                                     Text("NO_POST_MESSAGE")
                                 }
                                 else {
-                                    List(postViewModel.posts) { postData in
+                                    List(postViewModel.datas) { postData in
                                         PostElementView(postData: postData)
                                             .padding(.bottom)
                                             .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
@@ -98,7 +98,7 @@ struct ProfileView: View {
         }
         .task {
             await viewModel.loadUser(token: userStateViewModel.token, uuid: uuid)
-            await postViewModel.loadInitialPosts(token: userStateViewModel.token, uuid: uuid)
+            await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
         }
         .sheet(isPresented: $editingProfile) {
             ProfileEditView(newNickname: viewModel.nickname)

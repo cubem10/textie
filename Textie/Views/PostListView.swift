@@ -16,7 +16,7 @@ struct PostListView: View {
         Group {
             if viewModel.isInitialLoading {
                 ProgressView("POST_LOADING_MESSAGE")
-            } else if viewModel.postDatas.isEmpty {
+            } else if viewModel.datas.isEmpty {
                 Text("NO_POST_MESSAGE")
             }
             else {
@@ -30,11 +30,11 @@ struct PostListView: View {
                             Spacer()
                         }
                         
-                        List(viewModel.postDatas) { postData in
+                        List(viewModel.datas) { postData in
                             PostElementView(postData: postData)
                                 .padding(.bottom)
                                 .task {
-                                    await viewModel.loadMoreIfNeeded(currentItemID: postData.id)
+                                    await viewModel.loadMoreIfNeeded(id: postData.id)
                                 }
                                 .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                                 .background(
@@ -48,15 +48,15 @@ struct PostListView: View {
             }
         }
         .task {
-            await viewModel.loadInitialPosts(token: userStateViewModel.token)
+            await viewModel.loadInitialDatas(id: nil, token: userStateViewModel.token)
         }
         .refreshable {
             Task {
-                await viewModel.loadInitialPosts(token: userStateViewModel.token)
+                await viewModel.loadInitialDatas(id: nil, token: userStateViewModel.token)
             }
         }
-        .alert("NETWORK_ERROR", isPresented: $viewModel.showFailAlert, actions: { }, message: {
-            Text(viewModel.failDetail)
+        .alert("NETWORK_ERROR", isPresented: $viewModel.showError, actions: { }, message: {
+            Text(viewModel.errorDetails)
         })
     }
 }

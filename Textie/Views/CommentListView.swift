@@ -36,7 +36,7 @@ struct CommentListView: View {
                 Button(action: {
                     Task {
                         await viewModel.addComment(postId: postId, newComment: newComment, token: userStateViewModel.token)
-                        await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+                        await viewModel.loadInitialDatas(id: postId, token: userStateViewModel.token)
                         newComment = ""
                     }
                 }) {
@@ -51,7 +51,7 @@ struct CommentListView: View {
                     ProgressView("LOADING_MESSAGE")
                         .padding()
                 }
-                else if viewModel.comments.isEmpty {
+                else if viewModel.datas.isEmpty {
                     Text("NO_COMMENTS_MESSAGE")
                         .font(.title2)
                         .fontWeight(.bold)
@@ -62,7 +62,7 @@ struct CommentListView: View {
                 }
                 else {
                     ScrollView {
-                        ForEach(viewModel.comments) {
+                        ForEach(viewModel.datas) {
                             commentData in
                             HStack {
                                 CommentElementView(commentData: commentData)
@@ -81,7 +81,7 @@ struct CommentListView: View {
             }
         }
         .task {
-            await viewModel.loadInitialComments(postId: postId, token: userStateViewModel.token)
+            await viewModel.loadInitialDatas(id: postId, token: userStateViewModel.token)
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showError) {
             Button("CONFIRM") { }
