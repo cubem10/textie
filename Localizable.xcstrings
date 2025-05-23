@@ -836,6 +836,12 @@
         }
       }
     },
+    "SEE_LESS" : {
+
+    },
+    "SEE_MORE" : {
+
+    },
     "SELF_LIKE_NOT_AVAILABLE" : {
       "localizations" : {
         "en" : {

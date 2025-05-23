@@ -30,7 +30,11 @@ struct PostListView: View {
                     }
                     
                     List(viewModel.datas) { postData in
-                        PostElementView(postData: postData)
+                        PostElementView(postData: postData, onPostDeleted: {
+                            Task {
+                                await viewModel.loadInitialDatas(id: nil, token: userStateViewModel.token)
+                            }
+                        })
                             .padding(.bottom)
                             .task {
                                 await viewModel.loadMoreIfNeeded(id: postData.id)

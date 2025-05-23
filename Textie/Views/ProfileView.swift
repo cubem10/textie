@@ -77,7 +77,11 @@ struct ProfileView: View {
                             }
                             else {
                                 List(postViewModel.datas) { postData in
-                                    PostElementView(postData: postData)
+                                    PostElementView(postData: postData, onPostDeleted: {
+                                        Task {
+                                            await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
+                                        }
+                                    })
                                         .padding(.bottom)
                                         .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
                                         .task(id: postData.id) {

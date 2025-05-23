@@ -13,21 +13,29 @@ struct PostElementView: View {
     @State private var showComment: Bool = false
     @State private var commentDatas: [CommentData] = []
     @State private var showDialog: Bool = false
-    @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
-    @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
+    @State private var alertCause: AlertCause = .idle
+    @State private var showAlert: Bool = false
+    @State private var showMore: Bool = false
     
-    var contentLineLimit: ClosedRange? = 1...3
+    let onPostDeleted: () -> Void
     
     @Environment(UserStateViewModel.self) var userStateViewModel
     @Environment(\.colorScheme) var colorScheme
     
     private let logger = Logger()
     
+    enum AlertCause {
+        case deleteConfirmation
+        case showError
+        case idle
+    }
+    
     var body: some View {
         let isMyPost: Bool = postData.userId == userStateViewModel.uuid
+        let isClipped: Bool = postData.content.count > 140
         
         VStack(alignment: .leading) {
             HStack {
@@ -46,16 +54,29 @@ struct PostElementView: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .lineLimit(1)
-            if let contentLineLimit = contentLineLimit {
-                Text(postData.content)
-                    .padding(.bottom)
-                    .lineLimit(contentLineLimit)
+            Group {
+                if isClipped {
+                    if showMore == false {
+                        Text("\(postData.content.prefix(140))...")
+                        Text("SEE_MORE")
+                            .font(.subheadline)
+                            .onTapGesture {
+                                showMore.toggle()
+                            }
+                    }
+                    else {
+                        Text(postData.content)
+                        Text("SEE_LESS")
+                            .font(.subheadline)
+                            .onTapGesture {
+                                showMore.toggle()
+                            }
+                    }
+                } else {
+                    Text(postData.content)
+                }
             }
-            else {
-                Text(postData.content)
-                    .padding(.bottom)
-                    .lineLimit(nil)
-            }
+            .padding(.bottom)
             HStack {
                 Group {
                     if postData.isLiked { Image(systemName: "heart.fill") }
@@ -64,7 +85,8 @@ struct PostElementView: View {
                     Task {
                         if isMyPost {
                             errorMessage = String(localized: "SELF_LIKE_NOT_AVAILABLE")
-                            showErrorAlert.toggle()
+                            alertCause = .showError
+                            showAlert.toggle()
                             return
                         }
                         do {
@@ -74,7 +96,8 @@ struct PostElementView: View {
                         } catch {
                                 if (error as? URLError) != nil {
                                     errorMessage = error.localizedDescription
-                                    showErrorAlert.toggle()
+                                    alertCause = .showError
+                                    showAlert.toggle()
                                 }
                         }
                     }
@@ -98,22 +121,6 @@ struct PostElementView: View {
                 }
             }
         }
-        .alert(isPresented: $showDeleteAlert) {
-            Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
-                Task {
-                    do {
-                        let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
-                        let _ = await userStateViewModel.refreshSession()
-                    } catch {
-                        if (error as? URLError) != nil {
-                            errorMessage = error.localizedDescription
-                            showErrorAlert.toggle()
-                        }
-                    }
-                }
-            },
-                  secondaryButton: .cancel())
-        }
         .confirmationDialog("POST_MENU", isPresented: $showDialog) {
             Button(action: {
                 showEditView.toggle()
@@ -121,7 +128,8 @@ struct PostElementView: View {
                 Text("EDIT_POST")
             }
             Button(action: {
-                showDeleteAlert.toggle()
+                alertCause = .deleteConfirmation
+                showAlert.toggle()
             }) {
                 Text("REMOVE_POST")
             }
@@ -150,15 +158,48 @@ struct PostElementView: View {
             CommentListView(postId: postData.id).padding(.horizontal)
             Spacer()
         }
-        .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
-            Button("CONFIRM") { }
+        .alert(alertCause == .showError ? "REQUEST_PROCESSING_ERROR" : "REMOVE_POST_CONFIRMATION_TITLE", isPresented: $showAlert) {
+            if alertCause == .deleteConfirmation {
+                Button(role: .cancel) {
+                    alertCause = .idle
+                } label: {
+                    Text("CANCEL")
+                }
+                Button(role: .destructive) {
+                    Task {
+                        do {
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
+                            onPostDeleted()
+                        } catch {
+                            if (error as? URLError) != nil {
+                                errorMessage = error.localizedDescription
+                                alertCause = .showError
+                            }
+                        }
+                    }
+                    alertCause = .idle
+                } label: {
+                    Text("DELETE")
+                }
+            } else {
+                Button() {
+                    alertCause = .idle
+                } label: {
+                    Text("CONFIRM")
+                }
+            }
         } message: {
-            Text(errorMessage)
+            if alertCause == .deleteConfirmation {
+                Text("REMOVE_POST_CONFIRMATION_MESSAGE")
+            }
+            else {
+                Text(errorMessage)
+            }
         }
         
     }
 }
 
 #Preview {
-    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, isLiked: true, content: "Post content goes here. ", likes: 1234567890)).environment(UserStateViewModel())
+    PostElementView(postData: PostData(id: UUID(), name: "John Appleseed", title: "Title", createdAt: Date(), userId: UUID(), isEdited: true, isLiked: true, content: "Post content goes here. ", likes: 1234567890), onPostDeleted: { }).environment(UserStateViewModel())
 }
