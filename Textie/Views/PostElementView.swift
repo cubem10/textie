@@ -27,6 +27,8 @@ struct PostElementView: View {
     private let logger = Logger()
     
     var body: some View {
+        let isMyPost: Bool = postData.userId == userStateViewModel.uuid
+        
         VStack(alignment: .leading) {
             HStack {
                 ProfileImageView().frame(width: 30, height: 30)
@@ -48,23 +50,110 @@ struct PostElementView: View {
                 Text(postData.content)
                     .padding(.bottom)
                     .lineLimit(contentLineLimit)
-                
-                HStack {
-                    Group {
-                        if postData.isLiked { Image(systemName: "heart.fill") }
-                        else { Image(systemName: "heart") }
-                    }
-                    .foregroundStyle(colorScheme == .dark ? .white : .black)
-                    Text(postData.likes.formatted(.number.notation(.compactName)))
-                        .lineLimit(1)
-                    Image(systemName: "bubble")
-                }
             }
             else {
                 Text(postData.content)
                     .padding(.bottom)
                     .lineLimit(nil)
             }
+            HStack {
+                Group {
+                    if postData.isLiked { Image(systemName: "heart.fill") }
+                    else { Image(systemName: "heart") }
+                }.onTapGesture {
+                    Task {
+                        if isMyPost {
+                            errorMessage = String(localized: "SELF_LIKE_NOT_AVAILABLE")
+                            showErrorAlert.toggle()
+                            return
+                        }
+                        do {
+                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: postData.isLiked ? "DELETE" : "POST", withToken: userStateViewModel.token)
+                            postData.isLiked.toggle()
+                            postData.likes += postData.isLiked ? 1 : -1
+                        } catch {
+                                if (error as? URLError) != nil {
+                                    errorMessage = error.localizedDescription
+                                    showErrorAlert.toggle()
+                                }
+                        }
+                    }
+                }
+                .foregroundStyle(colorScheme == .dark ? .white : .black)
+                .contentShape(Rectangle())
+                
+                Text(postData.likes.formatted(.number.notation(.compactName)))
+                    .lineLimit(1)
+                
+                Image(systemName: "bubble")
+                    .onTapGesture {
+                        showComment.toggle()
+                    }
+                
+                if isMyPost {
+                    Image(systemName: "ellipsis")
+                        .onTapGesture {
+                            showDialog.toggle()
+                        }
+                }
+            }
+        }
+        .alert(isPresented: $showDeleteAlert) {
+            Alert(title: Text("REMOVE_POST_CONFIRMATION_TITLE"), message: Text("REMOVE_POST_CONFIRMATION_MESSAGE"), primaryButton: .destructive(Text("DELETE")) {
+                Task {
+                    do {
+                        let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
+                        let _ = await userStateViewModel.refreshSession()
+                    } catch {
+                        if (error as? URLError) != nil {
+                            errorMessage = error.localizedDescription
+                            showErrorAlert.toggle()
+                        }
+                    }
+                }
+            },
+                  secondaryButton: .cancel())
+        }
+        .confirmationDialog("POST_MENU", isPresented: $showDialog) {
+            Button(action: {
+                showEditView.toggle()
+            }) {
+                Text("EDIT_POST")
+            }
+            Button(action: {
+                showDeleteAlert.toggle()
+            }) {
+                Text("REMOVE_POST")
+            }
+            Button("CANCEL", role: .cancel) {
+                
+            }
+        }
+        .sheet(isPresented: $showProfileView) {
+            VStack(alignment: .trailing) {
+                Button(action: {
+                    showProfileView.toggle()
+                }) {
+                    Text("CLOSE")
+                }
+                ProfileView(uuid: postData.userId)
+            }.padding()
+        }
+        .sheet(isPresented: $showEditView) {
+            PostWriteView(title: postData.title, context: postData.content, postId: postData.id, selectedTab: .constant(0))
+        }
+        .sheet(isPresented: $showComment) {
+            HStack(alignment: .center) {
+                Image(systemName: "bubble")
+                Text("COMMENTS_TITLE")
+            }.padding()
+            CommentListView(postId: postData.id).padding(.horizontal)
+            Spacer()
+        }
+        .alert("REQUEST_PROCESSING_ERROR", isPresented: $showErrorAlert) {
+            Button("CONFIRM") { }
+        } message: {
+            Text(errorMessage)
         }
         
     }

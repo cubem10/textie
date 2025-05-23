@@ -20,31 +20,25 @@ struct PostListView: View {
                 Text("NO_POST_MESSAGE")
             }
             else {
-                NavigationStack {
-                    VStack(alignment: .leading){
-                        HStack {
-                            Text("POST_TITLE")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .padding()
-                            Spacer()
-                        }
-                        
-                        List(viewModel.datas) { postData in
-                            PostElementView(postData: postData)
-                                .padding(.bottom)
-                                .task {
-                                    await viewModel.loadMoreIfNeeded(id: postData.id)
-                                }
-                                .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
-                                .background(
-                                    NavigationLink("", destination: PostDetailView(postData: postData).padding()).opacity(0)
-                                )
-                        }.listStyle(.plain)
-                        
+                VStack(alignment: .leading){
+                    HStack {
+                        Text("POST_TITLE")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .padding()
+                        Spacer()
                     }
-                }.navigationTitle(Text("POST_DETAIL_VIEW_TITLE"))
-                    .navigationBarTitleDisplayMode(.inline)
+                    
+                    List(viewModel.datas) { postData in
+                        PostElementView(postData: postData)
+                            .padding(.bottom)
+                            .task {
+                                await viewModel.loadMoreIfNeeded(id: postData.id)
+                            }
+                            .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in 0 })
+                            
+                    }.listStyle(.plain)
+                }
             }
         }
         .task {
