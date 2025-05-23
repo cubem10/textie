@@ -107,7 +107,7 @@ struct ProfileView: View {
             await postViewModel.loadInitialDatas(id: uuid, token: userStateViewModel.token)
         }
         .sheet(isPresented: $editingProfile) {
-            ProfileEditView(newNickname: viewModel.nickname)
+            ProfileEditView(newNickname: viewModel.nickname, profileViewModel: viewModel)
         }
         .alert("REQUEST_PROCESSING_ERROR", isPresented: $viewModel.showFailAlert, actions: {
             Button("CONFIRM") {
