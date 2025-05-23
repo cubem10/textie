@@ -18,13 +18,20 @@ struct CommentElementView: View {
             ProfileImageView()
                 .frame(width: 44, height: 44)
             VStack(alignment: .leading) {
-                Text(commentData.name)
-                    .font(.headline)
+                HStack {
+                    Text(commentData.name)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text("⋅")
+                    Text(Date.relativeTime(commentData.createdAt))
+                        .font(.subheadline)
+                }
                 Group {
                     if isClipped {
                         if showMore == false {
                             Text("\(commentData.content.prefix(30))...")
                                 .font(.body)
+                                .fontWeight(.light)
                             Text("SEE_MORE")
                                 .font(.subheadline)
                                 .onTapGesture {
