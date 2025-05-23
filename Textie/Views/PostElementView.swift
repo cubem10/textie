@@ -15,10 +15,9 @@ struct PostElementView: View {
     @State private var showDialog: Bool = false
     @State private var showEditView: Bool = false
     @State private var showProfileView: Bool = false
-    @State private var errorMessage: String = ""
-    @State private var alertCause: AlertCause = .idle
-    @State private var showAlert: Bool = false
+    @State private var alertCause: AlertCause? = nil
     @State private var showMore: Bool = false
+    @State private var isLoading: Bool = false
     
     let onPostDeleted: () -> Void
     
@@ -29,112 +28,150 @@ struct PostElementView: View {
     
     enum AlertCause {
         case deleteConfirmation
-        case showError
-        case idle
+        case showError(String)
+    }
+    
+    func alertText(cause: AlertCause?) -> String {
+        switch cause {
+        case .deleteConfirmation:
+            return String(localized: "REMOVE_POST_CONFIRMATION_TITLE")
+        case .showError(_):
+            return String(localized: "REQUEST_PROCESSING_ERROR")
+        default:
+            return ""
+        }
+    }
+    
+    func deletePost() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
+        } catch {
+            if (error as? URLError) != nil {
+                alertCause = .showError(error.localizedDescription)
+            }
+        }
+    }
+    
+    private var showAlert: Binding<Bool> {
+        Binding<Bool>(
+            get: {
+                alertCause != nil
+            },
+            set: {
+                if !$0 {
+                    alertCause = nil
+                }
+            }
+        )
     }
     
     var body: some View {
         let isMyPost: Bool = postData.userId == userStateViewModel.uuid
         let isClipped: Bool = postData.content.count > 140
         
-        VStack(alignment: .leading) {
-            HStack {
-                ProfileImageView().frame(width: 30, height: 30)
-                    .onTapGesture {
-                        showProfileView.toggle()
-                    }
-                Text(postData.name)
-                    .lineLimit(1)
-                Text("⋅")
-                Text(Date.relativeTime(postData.createdAt) + (postData.isEdited ? " " + String(localized: "EDITED_TEXT") : ""))
-                    .font(.subheadline)
-            }.frame(height: 30)
-                .padding(.vertical, 5)
-            Text(postData.title)
-                .font(.title2)
-                .fontWeight(.bold)
-                .lineLimit(1)
-            Group {
-                if isClipped {
-                    if showMore == false {
-                        Text("\(postData.content.prefix(140))...")
-                        Text("SEE_MORE")
-                            .font(.subheadline)
+        Group {
+            if !isLoading {
+                VStack(alignment: .leading) {
+                    HStack {
+                        ProfileImageView().frame(width: 30, height: 30)
                             .onTapGesture {
-                                showMore.toggle()
+                                showProfileView.toggle()
                             }
-                    }
-                    else {
-                        Text(postData.content)
-                        Text("SEE_LESS")
+                        Text(postData.name)
+                            .lineLimit(1)
+                        Text("⋅")
+                        Text(Date.relativeTime(postData.createdAt) + (postData.isEdited ? " " + String(localized: "EDITED_TEXT") : ""))
                             .font(.subheadline)
-                            .onTapGesture {
-                                showMore.toggle()
+                    }.frame(height: 30)
+                        .padding(.vertical, 5)
+                    Text(postData.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                    Group {
+                        if isClipped {
+                            if showMore == false {
+                                Text("\(postData.content.prefix(140))...")
+                                Text("SEE_MORE")
+                                    .font(.subheadline)
+                                    .onTapGesture {
+                                        showMore.toggle()
+                                    }
                             }
-                    }
-                } else {
-                    Text(postData.content)
-                }
-            }
-            .padding(.bottom)
-            HStack {
-                Group {
-                    if postData.isLiked { Image(systemName: "heart.fill") }
-                    else { Image(systemName: "heart") }
-                }.onTapGesture {
-                    Task {
-                        if isMyPost {
-                            errorMessage = String(localized: "SELF_LIKE_NOT_AVAILABLE")
-                            alertCause = .showError
-                            showAlert.toggle()
-                            return
+                            else {
+                                Text(postData.content)
+                                Text("SEE_LESS")
+                                    .font(.subheadline)
+                                    .onTapGesture {
+                                        showMore.toggle()
+                                    }
+                            }
+                        } else {
+                            Text(postData.content)
                         }
-                        do {
-                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: postData.isLiked ? "DELETE" : "POST", withToken: userStateViewModel.token)
-                            postData.isLiked.toggle()
-                            postData.likes += postData.isLiked ? 1 : -1
-                        } catch {
-                                if (error as? URLError) != nil {
-                                    errorMessage = error.localizedDescription
-                                    alertCause = .showError
-                                    showAlert.toggle()
+                    }
+                    .padding(.bottom)
+                    HStack {
+                        Group {
+                            if postData.isLiked { Image(systemName: "heart.fill") }
+                            else { Image(systemName: "heart") }
+                        }.onTapGesture {
+                            Task {
+                                if isMyPost {
+                                    alertCause = .showError(String(localized: "SELF_LIKE_NOT_AVAILABLE"))
+                                    return
+                                }
+                                do {
+                                    let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/likes/", httpMethod: postData.isLiked ? "DELETE" : "POST", withToken: userStateViewModel.token)
+                                    postData.isLiked.toggle()
+                                    postData.likes += postData.isLiked ? 1 : -1
+                                } catch {
+                                        if (error as? URLError) != nil {
+                                            alertCause = .showError(error.localizedDescription)
+                                        }
+                                }
+                            }
+                        }
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
+                        .contentShape(Rectangle())
+                        
+                        Text(postData.likes.formatted(.number.notation(.compactName)))
+                            .lineLimit(1)
+                        
+                        Image(systemName: "bubble")
+                            .onTapGesture {
+                                showComment.toggle()
+                            }
+                        
+                        if isMyPost {
+                            Image(systemName: "ellipsis")
+                                .onTapGesture {
+                                    showDialog.toggle()
                                 }
                         }
                     }
                 }
-                .foregroundStyle(colorScheme == .dark ? .white : .black)
-                .contentShape(Rectangle())
-                
-                Text(postData.likes.formatted(.number.notation(.compactName)))
-                    .lineLimit(1)
-                
-                Image(systemName: "bubble")
-                    .onTapGesture {
-                        showComment.toggle()
+                .confirmationDialog("POST_MENU", isPresented: $showDialog) {
+                    Button(action: {
+                        showEditView.toggle()
+                    }) {
+                        Text("EDIT_POST")
                     }
-                
-                if isMyPost {
-                    Image(systemName: "ellipsis")
-                        .onTapGesture {
-                            showDialog.toggle()
-                        }
+                    Button(action: {
+                        alertCause = .deleteConfirmation
+                    }) {
+                        Text("REMOVE_POST")
+                    }
+                    Button("CANCEL", role: .cancel) {
+                        
+                    }
                 }
             }
-        }
-        .confirmationDialog("POST_MENU", isPresented: $showDialog) {
-            Button(action: {
-                showEditView.toggle()
-            }) {
-                Text("EDIT_POST")
-            }
-            Button(action: {
-                alertCause = .deleteConfirmation
-                showAlert.toggle()
-            }) {
-                Text("REMOVE_POST")
-            }
-            Button("CANCEL", role: .cancel) {
-                
+            else {
+                ProgressView().padding()
             }
         }
         .sheet(isPresented: $showProfileView) {
@@ -158,45 +195,30 @@ struct PostElementView: View {
             CommentListView(postId: postData.id).padding(.horizontal)
             Spacer()
         }
-        .alert(alertCause == .showError ? "REQUEST_PROCESSING_ERROR" : "REMOVE_POST_CONFIRMATION_TITLE", isPresented: $showAlert) {
-            if alertCause == .deleteConfirmation {
-                Button(role: .cancel) {
-                    alertCause = .idle
-                } label: {
-                    Text("CANCEL")
+        .alert(alertText(cause: alertCause), isPresented: showAlert, presenting: alertCause) { alert in
+            switch alert {
+            case .showError(_):
+                Button("CONFIRM", role: .cancel) {
+                    alertCause = nil
                 }
-                Button(role: .destructive) {
+            case .deleteConfirmation:
+                Button("CANCEL", role: .cancel) {
+                    alertCause = nil
+                }
+                Button("DELETE", role: .destructive) {
                     Task {
-                        do {
-                            let (_, _) = try await sendRequestToServer(toEndpoint: serverURLString + "/posts/\(postData.id)/", httpMethod: "DELETE", withToken: userStateViewModel.token)
-                            onPostDeleted()
-                        } catch {
-                            if (error as? URLError) != nil {
-                                errorMessage = error.localizedDescription
-                                alertCause = .showError
-                            }
-                        }
+                        await deletePost()
                     }
-                    alertCause = .idle
-                } label: {
-                    Text("DELETE")
-                }
-            } else {
-                Button() {
-                    alertCause = .idle
-                } label: {
-                    Text("CONFIRM")
                 }
             }
-        } message: {
-            if alertCause == .deleteConfirmation {
+        } message: { alert in
+            switch alert {
+            case .deleteConfirmation:
                 Text("REMOVE_POST_CONFIRMATION_MESSAGE")
-            }
-            else {
-                Text(errorMessage)
+            case .showError(let message):
+                Text(message)
             }
         }
-        
     }
 }
 
